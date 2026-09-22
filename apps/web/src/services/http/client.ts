@@ -187,6 +187,18 @@ export const httpClient: ApiClient = {
     validate: () => notImplemented('POST /imports/products/validate'),
     commit: () => notImplemented('POST /imports/products/commit'),
   },
+  retail: {
+    policies: () => notImplemented('GET /retail/policies'),
+    policyForProduct: () => notImplemented('GET /retail/policies/{productId}'),
+    upsertPolicy: () => notImplemented('PUT /retail/policies/{productId}'),
+    feeds: () => notImplemented('GET /retail/feeds'),
+    feedForCustomer: () => notImplemented('GET /retail/feeds/{customerId}'),
+    saveFeed: () => notImplemented('PUT /retail/feeds/{customerId}'),
+    runFeed: () => notImplemented('POST /retail/feeds/{customerId}/run'),
+    observations: () => notImplemented('GET /retail/observations'),
+    acknowledge: () => notImplemented('POST /retail/observations/{observationId}/acknowledge'),
+    summary: () => notImplemented('GET /retail/summary'),
+  },
   notifications: {
     list: () => notImplemented('GET /notifications'),
     markRead: () => notImplemented('PATCH /notifications/{notificationId}'),

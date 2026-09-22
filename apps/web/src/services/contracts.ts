@@ -28,6 +28,10 @@ import type {
   PriceList,
   Product,
   ProductQuery,
+  ResellerFeed,
+  RetailObservation,
+  RetailPolicy,
+  RetailSummary,
   RmaAnalytics,
   RmaCase,
   RmaDiagnosis,
@@ -180,6 +184,39 @@ export interface ImportService {
   commit(runId: string): Promise<ImportRun>;
 }
 
+/**
+ * Control de PVP: politicas por SKU, conexiones con el sitio de cada
+ * reseller y los precios publicados que se leen de ahi.
+ */
+export interface RetailPriceService {
+  /** Politicas de PVP. Un PM ve solo las de sus marcas. */
+  policies(filter: { brandId?: string; query?: string }, session: Session): Promise<RetailPolicy[]>;
+  policyForProduct(productId: string): Promise<RetailPolicy | null>;
+  upsertPolicy(
+    input: { productId: string; pvp: string; tolerancePct: number; enforced: boolean; notes?: string | null },
+    session: Session,
+  ): Promise<RetailPolicy>;
+
+  /** Conexiones de lectura. El cliente solo ve la suya. */
+  feeds(session: Session): Promise<ResellerFeed[]>;
+  feedForCustomer(customerId: string, session: Session): Promise<ResellerFeed | null>;
+  saveFeed(
+    input: { customerId: string; kind: ResellerFeed['kind']; url: string; matchBy: ResellerFeed['matchBy'] },
+    session: Session,
+  ): Promise<ResellerFeed>;
+  /** Fuerza una lectura ahora, sin esperar a la corrida diaria. */
+  runFeed(customerId: string, session: Session): Promise<ResellerFeed>;
+
+  /** Precios publicados observados. El cliente solo ve los suyos. */
+  observations(
+    filter: { customerId?: string; brandId?: string; status?: RetailObservation['status']; query?: string },
+    session: Session,
+  ): Promise<RetailObservation[]>;
+  /** El reseller marca que vio el aviso y lo va a corregir. */
+  acknowledge(observationId: string, session: Session): Promise<RetailObservation>;
+  summary(session: Session): Promise<RetailSummary>;
+}
+
 export interface NotificationService {
   list(session: Session): Promise<Notification[]>;
   markRead(id: string): Promise<Notification[]>;
@@ -199,6 +236,7 @@ export interface ApiClient {
   pm: ProductManagerService;
   integrations: IntegrationService;
   imports: ImportService;
+  retail: RetailPriceService;
   notifications: NotificationService;
   /** Identifica al adaptador activo, para mostrarlo en la UI. */
   readonly mode: 'mock' | 'api';
@@ -243,6 +281,8 @@ export const ERROR_CODES = {
   SERIAL_NOT_OWNED: 'SERIAL_NOT_OWNED',
   WARRANTY_EXPIRED: 'WARRANTY_EXPIRED',
   RMA_ALREADY_OPEN: 'RMA_ALREADY_OPEN',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  INTEGRATION_ERROR: 'INTEGRATION_ERROR',
   INTERNAL: 'INTERNAL_ERROR',
   UPSTREAM_UNAVAILABLE: 'UPSTREAM_UNAVAILABLE',
   API_NOT_AVAILABLE: 'API_NOT_AVAILABLE',

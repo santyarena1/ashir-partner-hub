@@ -86,13 +86,24 @@ El catálogo completo se importó de la **lista de distribuidor real**:
   un serial de otro reseller no devuelve ningún dato del tercero.
 - **Concurrencia optimista en pedidos** — versión, conflicto 409 y
   previsualización del impacto de un cambio antes de aplicarlo.
+- **Control de PVP** — el PM fija el precio de venta al público por SKU y el
+  sistema lo contrasta contra lo que cada reseller publica en su propio sitio.
+  El reseller ve sólo sus publicaciones; los precios de otro reseller nunca se
+  exponen. Está cubierto por tests.
+- **Cuenta corriente del reseller** — saldo, comprobantes emitidos (facturas y
+  notas de crédito con CAE) y movimientos con saldo acumulado.
+- **Operar en nombre de un cliente** — un comercial arma el pedido por el
+  reseller que se lo pidió por teléfono o WhatsApp. El pedido queda a nombre
+  del cliente y la auditoría guarda quién lo cargó.
 - **Importador de Excel** — lee el archivo en el navegador, detecta la hoja y
   los encabezados, mapea columnas, valida y reporta por fila.
 
 ### Simulado (datos de demostración)
 
 Costos, márgenes, cantidades de stock, series de venta de 12 meses, clientes,
-pedidos históricos, casos de RMA, lotes, puntos y notificaciones.
+pedidos históricos, casos de RMA, lotes, puntos y notificaciones. También las
+políticas de PVP, las conexiones con el sitio de cada reseller y los precios
+publicados que se leerían de esos feeds.
 
 Se generan con un PRNG determinista sembrado por SKU, así que **no cambian entre
 recargas** y los números cierran entre pantallas. El archivo de distribuidor no
@@ -264,11 +275,15 @@ Monorepo con workspaces de npm: `apps/web` es la aplicación; `docs`, `data`,
 npm test
 ```
 
-19 tests sobre las dos piezas que romperían la presentación si estuvieran mal:
+25 tests sobre las piezas que romperían la presentación si estuvieran mal:
 
 - **Motor de precios** — que el desglose sume el total, que más cantidad nunca
   suba el precio unitario, que un Platinum pague menos que un Silver, que las
   exclusiones y vigencias se respeten.
+- **Control de PVP** — que un reseller no vea las publicaciones de otro, que no
+  pueda tocar su conexión, que el PM sólo controle sus marcas, que el PVP no
+  pueda quedar por debajo del precio de lista y que cambiarlo recalcule los
+  desvíos ya observados.
 - **Privacidad y permisos** — que un serial de otro reseller no filtre ningún
   dato, que el rol Cliente reciba costo y margen en `null`, que un cliente no
   pueda listar los pedidos de otro.

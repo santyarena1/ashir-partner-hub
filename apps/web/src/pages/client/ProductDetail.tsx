@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   ArrowLeftRight,
+  BadgeDollarSign,
   FileText,
   Heart,
   Minus,
@@ -59,6 +60,16 @@ export function ProductDetail() {
     [product.data?.id, qty, session.customerId],
   );
   const orders = useAsync(() => api.orders.list({}, session), [session.customerId]);
+  /* PVP de la marca y, si existe, como lo estoy publicando yo. */
+  const retail = useAsync(
+    () => (product.data ? api.retail.policyForProduct(product.data.id) : Promise.resolve(null)),
+    [product.data?.id],
+  );
+  const myObservations = useAsync(
+    () => (product.data ? api.retail.observations({ query: product.data.sku }, session) : Promise.resolve([])),
+    [product.data?.id, session.customerId],
+  );
+
 
   const customer = customerById(session.customerId ?? '');
 
@@ -88,6 +99,7 @@ export function ProductDetail() {
   }
 
   const p = product.data;
+  const myObservation = (myObservations.data ?? []).find((o) => o.productId === p.id) ?? null;
   const pm = pmById(p.pmId);
   const related = relatedProducts(p);
 
@@ -511,6 +523,58 @@ export function ProductDetail() {
               )}
             </div>
           </Card>
+
+          {/* --- PVP sugerido por la marca --- */}
+          {retail.data && (
+            <Card className="mt-4">
+              <CardHeader
+                title="Precio de venta al público"
+                subtitle={retail.data.enforced ? 'Precio mínimo anunciado (MAP)' : 'Sugerido por la marca'}
+                icon={<BadgeDollarSign className="size-4" />}
+              />
+              <div className="px-5 pb-4">
+                <p className="text-[22px] leading-none font-bold tracking-tight text-ink-900">
+                  {fmtMoney(retail.data.pvp)}
+                </p>
+                {retail.data.resellerMarginPct !== null && (
+                  <p className="mt-1.5 text-[13px] text-ink-500">
+                    Vendiendo a ese precio tu margen es de{' '}
+                    <span className="font-semibold text-ok-600">{retail.data.resellerMarginPct.toFixed(1)}%</span>.
+                  </p>
+                )}
+                {retail.data.notes && (
+                  <p className="mt-2 text-xs leading-relaxed text-ink-500">{retail.data.notes}</p>
+                )}
+                {myObservation && (
+                  <div className="mt-3 border-t border-ink-100 pt-3">
+                    <div className="flex items-baseline justify-between gap-3 text-[13px]">
+                      <span className="text-ink-500">Tu precio publicado</span>
+                      <span
+                        className={cn(
+                          'font-semibold tabular-nums',
+                          myObservation.status === 'BELOW' ? 'text-bad-600' : 'text-ink-900',
+                        )}
+                      >
+                        {fmtMoney(myObservation.publishedPrice)}
+                      </span>
+                    </div>
+                    {myObservation.status === 'BELOW' && (
+                      <Callout tone={retail.data.enforced ? 'bad' : 'warn'} className="mt-2">
+                        Lo estás publicando {Math.abs(myObservation.deviationPct).toFixed(1)}% por debajo del PVP.{' '}
+                        <Link to="/pvp" className="font-semibold underline underline-offset-2">
+                          Ver el detalle
+                        </Link>
+                      </Callout>
+                    )}
+                  </div>
+                )}
+                <p className="mt-3 text-[11px] leading-relaxed text-ink-400">
+                  El PVP lo define el Product Manager de {p.brand}. Es el precio de referencia de góndola, no tu precio
+                  de compra.
+                </p>
+              </div>
+            </Card>
+          )}
 
           {/* --- condiciones que no aplican, para transparencia --- */}
           {evaluation.data && evaluation.data.skippedConditions.length > 0 && (

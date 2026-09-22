@@ -27,6 +27,8 @@ import { RmaPortal } from '@/pages/client/RmaPortal';
 import { RmaLookup } from '@/pages/client/RmaLookup';
 import { RmaNew } from '@/pages/client/RmaNew';
 import { RmaCasePage } from '@/pages/client/RmaCase';
+import { AccountPage } from '@/pages/client/Account';
+import { ClientRetailPrice } from '@/pages/client/RetailPrice';
 
 /* --- backoffice --- */
 import { BoDashboard } from '@/pages/bo/Dashboard';
@@ -48,6 +50,7 @@ import { PmSimulator } from '@/pages/bo/pm/Simulator';
 import { PmStock } from '@/pages/bo/pm/Stock';
 import { PmPricing } from '@/pages/bo/pm/Pricing';
 import { PmObjectives } from '@/pages/bo/pm/Objectives';
+import { PmRetailPrice } from '@/pages/bo/pm/RetailPrice';
 import { RmaCenter } from '@/pages/bo/rma/Center';
 import { RmaCaseBackoffice } from '@/pages/bo/rma/CaseDetail';
 import { RmaReception } from '@/pages/bo/rma/Reception';
@@ -83,6 +86,8 @@ export const router = createBrowserRouter([
       { path: 'pedidos', element: <OrdersPage /> },
       { path: 'pedidos/:id', element: <OrderDetailPage /> },
       { path: 'beneficios', element: <BenefitsPage /> },
+      { path: 'cuenta', element: <AccountPage /> },
+      { path: 'pvp', element: <ClientRetailPrice /> },
       { path: 'favoritos', element: <FavoritesPage /> },
       { path: 'precio-especial', element: <SpecialPricePage /> },
       { path: 'precio-especial/:id', element: <SpecialPriceDetailPage /> },
@@ -116,6 +121,7 @@ export const router = createBrowserRouter([
       { path: 'pm/stock', element: <PmStock /> },
       { path: 'pm/pricing', element: <PmPricing /> },
       { path: 'pm/objetivos', element: <PmObjectives /> },
+      { path: 'pm/pvp', element: <PmRetailPrice /> },
       { path: 'rma', element: <RmaCenter /> },
       { path: 'rma/recepcion', element: <RmaReception /> },
       { path: 'rma/analytics', element: <RmaAnalyticsPage /> },

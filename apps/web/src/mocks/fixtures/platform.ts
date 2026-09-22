@@ -455,6 +455,24 @@ export const NOTIFICATIONS: Notification[] = [
     body: 'LOTE-MSI-260326-A presenta una tasa de RMA muy por encima del promedio de la marca.',
     at: mins(220), read: false, href: '/bo/rma/lotes/LOTE-MSI-260326-A', severity: 'CRITICAL',
   },
+  {
+    id: 'ntf_13', roles: ['CLIENT'], customerId: 'cus_gaming_store', kind: 'PVP',
+    title: 'Tenés publicaciones por debajo del PVP',
+    body: 'La lectura diaria de tu feed encontró productos publicados por debajo del precio sugerido. En los marcados como MAP eso incumple el acuerdo con la marca.',
+    at: mins(90), read: false, href: '/pvp', severity: 'WARNING',
+  },
+  {
+    id: 'ntf_14', roles: ['PM', 'ADMIN'], customerId: null, kind: 'PVP',
+    title: 'Desvíos de PVP en la lectura de hoy',
+    body: 'Hay resellers publicando por debajo del precio mínimo anunciado en varios SKU con MAP activo.',
+    at: mins(75), read: false, href: '/bo/pm/pvp', severity: 'WARNING',
+  },
+  {
+    id: 'ntf_15', roles: ['ADMIN'], customerId: null, kind: 'PVP',
+    title: 'Un feed de reseller dejó de responder',
+    body: 'La URL del feed devuelve 403 desde el 20/09. Sin lectura no se puede controlar el PVP de esa cuenta.',
+    at: mins(1_500), read: false, href: '/bo/pm/pvp', severity: 'CRITICAL',
+  },
 ];
 
 /* ------------------------------------------------------------------ */

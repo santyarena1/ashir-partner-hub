@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  BadgeDollarSign,
   Bell,
   CheckCheck,
   CircleAlert,
@@ -32,6 +33,7 @@ const KIND_ICON: Record<Notification['kind'], typeof Bell> = {
   APPROVAL: CircleAlert,
   IMPORT: Package,
   INTEGRATION: Plug,
+  PVP: BadgeDollarSign,
 };
 
 const SEVERITY_STYLE: Record<Notification['severity'], string> = {

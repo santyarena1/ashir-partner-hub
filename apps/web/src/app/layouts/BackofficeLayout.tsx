@@ -7,6 +7,7 @@
 import { useState, type ComponentType } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import {
+  BadgeDollarSign,
   BadgePercent,
   Boxes,
   Building2,
@@ -73,6 +74,7 @@ const SALES_NAV: NavGroup[] = [
     items: [
       { to: '/bo/productos', label: 'Productos', icon: Boxes },
       { to: '/bo/rma', label: 'RMA', icon: Wrench },
+      { to: '/bo/pm/pvp', label: 'Control de PVP', icon: BadgeDollarSign },
       { to: '/bo/partner', label: 'Ashir Partner', icon: Sparkles },
     ],
   },
@@ -86,6 +88,7 @@ const PM_NAV: NavGroup[] = [
       { to: '/bo/marcas', label: 'Marcas', icon: Tag },
       { to: '/bo/productos', label: 'Productos', icon: Boxes },
       { to: '/bo/pm/pricing', label: 'Pricing', icon: BadgePercent },
+      { to: '/bo/pm/pvp', label: 'Control de PVP', icon: BadgeDollarSign },
       { to: '/bo/pm/stock', label: 'Stock y aging', icon: PackageSearch },
       { to: '/bo/pm/simulador', label: 'Simulador comercial', icon: FlaskConical },
     ],
@@ -148,6 +151,7 @@ const ADMIN_NAV: NavGroup[] = [
       { to: '/bo/precios', label: 'Listas de precios', icon: FileText },
       { to: '/bo/condiciones', label: 'Condiciones comerciales', icon: BadgePercent },
       { to: '/bo/pm', label: 'Product Managers', icon: Users },
+      { to: '/bo/pm/pvp', label: 'Control de PVP', icon: BadgeDollarSign },
     ],
   },
   {

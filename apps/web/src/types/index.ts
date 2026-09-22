@@ -414,6 +414,9 @@ export interface CustomerAccount {
   invoices: Invoice[];
 }
 
+/** Tipo de comprobante fiscal emitido por Ashir. */
+export type DocumentKind = 'INVOICE' | 'CREDIT_NOTE' | 'DEBIT_NOTE';
+
 export interface Invoice {
   id: string;
   number: string;
@@ -422,6 +425,129 @@ export interface Invoice {
   dueAt: string;
   total: Money;
   status: 'PAID' | 'PENDING' | 'OVERDUE' | 'PARTIAL';
+  /** Factura, nota de credito o nota de debito. */
+  kind: DocumentKind;
+  /** Letra del comprobante (A / B / C). */
+  letter: 'A' | 'B' | 'C';
+  /** CAE de AFIP. DEPENDE DEL ERP: aca es simulado. */
+  cae: string | null;
+  caeExpiresAt: string | null;
+  /** Saldo pendiente del comprobante. */
+  balance: Money;
+  /** Comprobante que esta nota de credito/debito ajusta. */
+  relatedDocumentId: string | null;
+}
+
+/** Movimiento de cuenta corriente: comprobante o cobranza. */
+export interface AccountMovement {
+  id: string;
+  at: string;
+  kind: DocumentKind | 'PAYMENT';
+  label: string;
+  reference: string;
+  /** Positivo suma deuda (factura), negativo la baja (pago / NC). */
+  amount: Money;
+  /** Saldo acumulado despues del movimiento. */
+  runningBalance: Money;
+  documentId: string | null;
+  orderId: string | null;
+}
+
+/* ------------------------------------------------------------------ */
+/* PVP: precio de venta al publico y su control                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Politica de PVP de un SKU, definida por el Product Manager de la marca.
+ *
+ * El PVP es el precio sugerido de venta al publico. Cuando `enforced` esta
+ * activo funciona como precio minimo anunciado (MAP): publicar por debajo
+ * es un incumplimiento del acuerdo, no una sugerencia ignorada.
+ */
+export interface RetailPolicy {
+  id: string;
+  productId: string;
+  sku: string;
+  productName: string;
+  brandId: string;
+  brand: string;
+  /** Precio sugerido al publico, IVA incluido. */
+  pvp: Money;
+  /** Cuanto puede bajar un reseller antes de que cuente como desvio. */
+  tolerancePct: number;
+  enforced: boolean;
+  /** Margen que le queda al reseller comprando a lista y vendiendo al PVP. */
+  resellerMarginPct: number | null;
+  updatedAt: string;
+  updatedBy: string;
+  source: 'PM' | 'BRAND' | 'IMPORT';
+  notes: string | null;
+}
+
+/** Como se leen los precios publicados de un reseller. */
+export type FeedKind = 'XML' | 'GOOGLE_MERCHANT' | 'CSV' | 'API' | 'MANUAL';
+
+export interface ResellerFeed {
+  id: string;
+  customerId: string;
+  customerName: string;
+  kind: FeedKind;
+  /** URL del feed o del sitio del reseller. */
+  url: string;
+  status: 'OK' | 'WARNING' | 'ERROR' | 'PENDING';
+  /** Corre una vez por dia. */
+  schedule: 'DAILY';
+  lastRunAt: string | null;
+  nextRunAt: string | null;
+  /** Items leidos en la ultima corrida. */
+  itemsFound: number;
+  /** Cuantos de esos items se pudieron matchear contra el catalogo. */
+  matchedSkus: number;
+  /** Como se resuelve el match: por SKU propio, part number o EAN. */
+  matchBy: 'SKU' | 'PART_NUMBER' | 'EAN' | 'TITLE';
+  message: string | null;
+  createdAt: string;
+}
+
+export type RetailObservationStatus = 'OK' | 'BELOW' | 'ABOVE' | 'NOT_LISTED';
+
+/** Un precio publicado leido del sitio de un reseller, contra su PVP. */
+export interface RetailObservation {
+  id: string;
+  customerId: string;
+  customerName: string;
+  productId: string;
+  sku: string;
+  productName: string;
+  brandId: string;
+  brand: string;
+  observedAt: string;
+  publishedPrice: Money;
+  pvp: Money;
+  /** Negativo = publicado por debajo del PVP. */
+  deviationPct: number;
+  status: RetailObservationStatus;
+  /** Ficha del producto en el sitio del reseller. */
+  url: string;
+  enforced: boolean;
+  /** Cuando el reseller marco que lo vio. */
+  acknowledgedAt: string | null;
+  /** Serie de los ultimos dias, para el sparkline. */
+  history: { at: string; price: Money }[];
+}
+
+export interface RetailSummary {
+  policies: number;
+  monitoredResellers: number;
+  observations: number;
+  below: number;
+  above: number;
+  ok: number;
+  /** Resellers con al menos un desvio por debajo. */
+  resellersBelow: number;
+  worst: RetailObservation[];
+  lastRunAt: string | null;
+  byBrand: { brandId: string; brand: string; below: number; observations: number }[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -1101,6 +1227,9 @@ export type WebhookEventType =
   | 'customer.updated'
   | 'product.stock_changed'
   | 'price_list.updated'
+  | 'retail_policy.updated'
+  | 'retail_price.breach_detected'
+  | 'retail_price.acknowledged'
   | 'integration.sync_failed';
 
 export interface WebhookDelivery {
@@ -1133,7 +1262,8 @@ export interface Notification {
     | 'STOCK'
     | 'APPROVAL'
     | 'IMPORT'
-    | 'INTEGRATION';
+    | 'INTEGRATION'
+    | 'PVP';
   title: string;
   body: string;
   at: string;

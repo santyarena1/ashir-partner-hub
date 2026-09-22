@@ -20,6 +20,9 @@ import type {
   PartnerStatus,
   PriceEvaluation,
   Product,
+  ResellerFeed,
+  RetailObservation,
+  RetailPolicy,
   ProductQuery,
   RmaCase,
   RmaStatus,
@@ -2165,6 +2168,294 @@ const notifications: ApiClient['notifications'] = {
   },
 };
 
+
+/* ================================================================== */
+/* control de PVP                                                      */
+/* ================================================================== */
+
+/** Un PM solo controla el PVP de sus marcas; ADMIN ve todo. */
+function visibleBrandIds(session: Session): string[] | null {
+  if (session.role === 'PM' && session.brandIds && session.brandIds.length > 0) return session.brandIds;
+  return null;
+}
+
+function recomputeObservation(o: RetailObservation, policy: RetailPolicy): RetailObservation {
+  const pvp = num(policy.pvp);
+  const published = num(o.publishedPrice);
+  const deviationPct = Math.round(((published - pvp) / pvp) * 1000) / 10;
+  return {
+    ...o,
+    pvp: policy.pvp,
+    enforced: policy.enforced,
+    deviationPct,
+    status:
+      deviationPct < -policy.tolerancePct ? 'BELOW' : deviationPct > policy.tolerancePct ? 'ABOVE' : 'OK',
+  };
+}
+
+const retail: ApiClient['retail'] = {
+  async policies(filter, session) {
+    await latency();
+    requireScope(session, 'pricing:read', 'ver las políticas de PVP');
+    const brands = visibleBrandIds(session);
+    let items = getState().retailPolicies;
+    if (brands) items = items.filter((p) => brands.includes(p.brandId));
+    if (filter.brandId) items = items.filter((p) => p.brandId === filter.brandId);
+    if (filter.query) {
+      const q = normalize(filter.query);
+      items = items.filter((p) => normalize(p.sku).includes(q) || normalize(p.productName).includes(q));
+    }
+    return items;
+  },
+
+  async policyForProduct(productId) {
+    await fastLatency();
+    return getState().retailPolicies.find((p) => p.productId === productId) ?? null;
+  },
+
+  async upsertPolicy(input, session) {
+    await latency();
+    requireScope(session, 'pricing:manage', 'definir el PVP de un producto');
+    const product = productById(input.productId);
+    if (!product) throw new ServiceError(ERROR_CODES.NOT_FOUND, 'Producto inexistente.', 404, [], requestId());
+    if (session.role === 'PM' && !ownsBrand(session, product.brandId)) {
+      throw new ServiceError(
+        ERROR_CODES.FORBIDDEN,
+        'Solo el Product Manager de la marca puede fijar su PVP.',
+        403,
+        [],
+        requestId(),
+      );
+    }
+    const pvp = Number.parseFloat(input.pvp);
+    if (!Number.isFinite(pvp) || pvp <= 0) {
+      throw new ServiceError(
+        ERROR_CODES.VALIDATION_ERROR,
+        'El PVP tiene que ser un importe mayor a cero.',
+        400,
+        [{ field: 'pvp', reason: 'INVALID_AMOUNT' }],
+        requestId(),
+      );
+    }
+    const listPrice = num(product.listPrice);
+    if (listPrice > 0 && pvp < listPrice) {
+      throw new ServiceError(
+        ERROR_CODES.VALIDATION_ERROR,
+        `El PVP no puede quedar por debajo del precio de lista del reseller (USD ${listPrice.toFixed(2)}).`,
+        400,
+        [{ field: 'pvp', reason: 'BELOW_LIST_PRICE' }],
+        requestId(),
+      );
+    }
+
+    const existing = getState().retailPolicies.find((p) => p.productId === input.productId);
+    const next: RetailPolicy = {
+      id: existing?.id ?? `rp_${product.sku.toLowerCase()}`,
+      productId: product.id,
+      sku: product.sku,
+      productName: product.name,
+      brandId: product.brandId,
+      brand: product.brand,
+      pvp: money(pvp),
+      tolerancePct: input.tolerancePct,
+      enforced: input.enforced,
+      resellerMarginPct: listPrice > 0 ? Math.round(((pvp - listPrice) / pvp) * 1000) / 10 : null,
+      updatedAt: now(),
+      updatedBy: session.name,
+      source: 'PM',
+      notes: input.notes ?? existing?.notes ?? null,
+    };
+
+    mutate((s) => {
+      s.retailPolicies = existing
+        ? s.retailPolicies.map((p) => (p.id === next.id ? next : p))
+        : [next, ...s.retailPolicies];
+      // Cambiar el PVP reevalua los desvios ya observados: el precio
+      // publicado no cambio, pero la referencia contra la que se mide si.
+      s.retailObservations = s.retailObservations.map((o) =>
+        o.productId === next.productId ? recomputeObservation(o, next) : o,
+      );
+      s.webhooks = [
+        buildWebhook('retail_policy.updated', { sku: next.sku, pvp: next.pvp.amount, enforced: next.enforced }),
+        ...s.webhooks,
+      ];
+    });
+    return next;
+  },
+
+  async feeds(session) {
+    await latency();
+    const all = getState().resellerFeeds;
+    if (isCustomerScoped(session)) return all.filter((f) => f.customerId === session.customerId);
+    requireScope(session, 'customers:read', 'ver las conexiones de los resellers');
+    return all;
+  },
+
+  async feedForCustomer(customerId, session) {
+    await fastLatency();
+    if (isCustomerScoped(session) && customerId !== session.customerId) {
+      throw new ServiceError(ERROR_CODES.FORBIDDEN, 'La conexión pertenece a otra cuenta.', 403, [], requestId());
+    }
+    return getState().resellerFeeds.find((f) => f.customerId === customerId) ?? null;
+  },
+
+  async saveFeed(input, session) {
+    await latency();
+    if (isCustomerScoped(session) && input.customerId !== session.customerId) {
+      throw new ServiceError(ERROR_CODES.FORBIDDEN, 'La conexión pertenece a otra cuenta.', 403, [], requestId());
+    }
+    const customer = customerById(input.customerId);
+    if (!customer) throw new ServiceError(ERROR_CODES.NOT_FOUND, 'Cuenta inexistente.', 404, [], requestId());
+    if (input.kind !== 'MANUAL' && !/^https?:\/\/.+/.test(input.url)) {
+      throw new ServiceError(
+        ERROR_CODES.VALIDATION_ERROR,
+        'La URL del feed tiene que empezar con http:// o https://.',
+        400,
+        [{ field: 'url', reason: 'INVALID_URL' }],
+        requestId(),
+      );
+    }
+
+    const existing = getState().resellerFeeds.find((f) => f.customerId === input.customerId);
+    const next: ResellerFeed = {
+      id: existing?.id ?? `feed_${customer.id}`,
+      customerId: customer.id,
+      customerName: customer.tradeName,
+      kind: input.kind,
+      url: input.url,
+      status: 'PENDING',
+      schedule: 'DAILY',
+      lastRunAt: existing?.lastRunAt ?? null,
+      nextRunAt: existing?.nextRunAt ?? null,
+      itemsFound: existing?.itemsFound ?? 0,
+      matchedSkus: existing?.matchedSkus ?? 0,
+      matchBy: input.matchBy,
+      message: 'Conexión guardada. Se va a leer en la próxima corrida diaria.',
+      createdAt: existing?.createdAt ?? now(),
+    };
+    mutate((s) => {
+      s.resellerFeeds = existing
+        ? s.resellerFeeds.map((f) => (f.id === next.id ? next : f))
+        : [next, ...s.resellerFeeds];
+    });
+    return next;
+  },
+
+  async runFeed(customerId, session) {
+    await latency();
+    const feed = await retail.feedForCustomer(customerId, session);
+    if (!feed) throw new ServiceError(ERROR_CODES.NOT_FOUND, 'No hay conexión configurada.', 404, [], requestId());
+    if (!feed.url) {
+      throw new ServiceError(
+        ERROR_CODES.VALIDATION_ERROR,
+        'Cargá la URL del feed antes de ejecutar una lectura.',
+        400,
+        [{ field: 'url', reason: 'MISSING_URL' }],
+        requestId(),
+      );
+    }
+    if (isScenarioOn('ERP_DOWN')) {
+      throw new ServiceError(
+        ERROR_CODES.INTEGRATION_ERROR,
+        'El lector de feeds no respondió. Reintentá en unos minutos.',
+        502,
+        [],
+        requestId(),
+      );
+    }
+
+    const updated: ResellerFeed = {
+      ...feed,
+      status: 'OK',
+      lastRunAt: now(),
+      nextRunAt: addDays(now(), 1),
+      message: null,
+    };
+    mutate((s) => {
+      s.resellerFeeds = s.resellerFeeds.map((f) => (f.id === updated.id ? updated : f));
+    });
+    return updated;
+  },
+
+  async observations(filter, session) {
+    await latency();
+    let items = getState().retailObservations;
+
+    if (isCustomerScoped(session)) {
+      // El reseller solo ve sus propias publicaciones: los precios de otro
+      // reseller son informacion comercial de un tercero.
+      items = items.filter((o) => o.customerId === session.customerId);
+    } else {
+      requireScope(session, 'pricing:read', 'ver el control de PVP');
+      const brands = visibleBrandIds(session);
+      if (brands) items = items.filter((o) => brands.includes(o.brandId));
+      if (filter.customerId) items = items.filter((o) => o.customerId === filter.customerId);
+    }
+
+    if (filter.brandId) items = items.filter((o) => o.brandId === filter.brandId);
+    if (filter.status) items = items.filter((o) => o.status === filter.status);
+    if (filter.query) {
+      const q = normalize(filter.query);
+      items = items.filter(
+        (o) =>
+          normalize(o.sku).includes(q) ||
+          normalize(o.productName).includes(q) ||
+          normalize(o.customerName).includes(q),
+      );
+    }
+    return items;
+  },
+
+  async acknowledge(observationId, session) {
+    await latency();
+    const found = getState().retailObservations.find((o) => o.id === observationId);
+    if (!found) throw new ServiceError(ERROR_CODES.NOT_FOUND, 'Observación inexistente.', 404, [], requestId());
+    if (isCustomerScoped(session) && found.customerId !== session.customerId) {
+      throw new ServiceError(ERROR_CODES.FORBIDDEN, 'La observación es de otra cuenta.', 403, [], requestId());
+    }
+    const updated = { ...found, acknowledgedAt: now() };
+    mutate((s) => {
+      s.retailObservations = s.retailObservations.map((o) => (o.id === updated.id ? updated : o));
+      s.webhooks = [
+        buildWebhook('retail_price.acknowledged', { sku: updated.sku, customerId: updated.customerId }),
+        ...s.webhooks,
+      ];
+    });
+    return updated;
+  },
+
+  async summary(session) {
+    await latency();
+    const observations = await retail.observations({}, session);
+    const brands = visibleBrandIds(session);
+    const policies = brands
+      ? getState().retailPolicies.filter((p) => brands.includes(p.brandId))
+      : getState().retailPolicies;
+
+    const below = observations.filter((o) => o.status === 'BELOW');
+    const byBrandMap = new Map<string, { brandId: string; brand: string; below: number; observations: number }>();
+    for (const o of observations) {
+      const entry = byBrandMap.get(o.brandId) ?? { brandId: o.brandId, brand: o.brand, below: 0, observations: 0 };
+      entry.observations += 1;
+      if (o.status === 'BELOW') entry.below += 1;
+      byBrandMap.set(o.brandId, entry);
+    }
+
+    return {
+      policies: policies.length,
+      monitoredResellers: new Set(observations.map((o) => o.customerId)).size,
+      observations: observations.length,
+      below: below.length,
+      above: observations.filter((o) => o.status === 'ABOVE').length,
+      ok: observations.filter((o) => o.status === 'OK').length,
+      resellersBelow: new Set(below.map((o) => o.customerId)).size,
+      worst: [...below].sort((a, b) => a.deviationPct - b.deviationPct).slice(0, 6),
+      lastRunAt: getState().resellerFeeds.find((f) => f.lastRunAt)?.lastRunAt ?? null,
+      byBrand: [...byBrandMap.values()].sort((a, b) => b.below - a.below),
+    };
+  },
+};
+
 /* ------------------------------------------------------------------ */
 
 export const mockClient: ApiClient = {
@@ -2178,6 +2469,7 @@ export const mockClient: ApiClient = {
   pm,
   integrations,
   imports,
+  retail,
   notifications,
   mode: 'mock',
 };

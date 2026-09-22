@@ -4,7 +4,7 @@
  *
  * Datos simulados. Los CUIT son ficticios.
  */
-import type { Customer, CustomerSegment, Invoice, PaymentTerm } from '@/types';
+import type { AccountMovement, Customer, CustomerSegment, Invoice, PaymentTerm } from '@/types';
 import { addDays, betweenSeeded, money } from '@/lib/utils';
 
 const NOW = new Date('2026-09-22T11:00:00-03:00').toISOString();
@@ -214,7 +214,7 @@ const DOC_SETS: Customer['documents'][] = [
 
 function buildInvoices(seed: Seed): Invoice[] {
   if (seed.purchases12m === 0) return [];
-  const count = betweenSeeded(seed.id + 'inv', 3, 6);
+  const count = betweenSeeded(seed.id + 'inv', 5, 9);
   const invoices: Invoice[] = [];
   for (let i = 0; i < count; i++) {
     const issued = addDays(NOW, -(i * 14 + betweenSeeded(seed.id + i, 2, 9)));
@@ -222,6 +222,8 @@ function buildInvoices(seed: Seed): Invoice[] {
     const due = addDays(issued, dueDays);
     const total = betweenSeeded(seed.id + 'amt' + i, 1_800, 26_000);
     const overdueNow = new Date(due).getTime() < Date.now();
+    const status: Invoice['status'] =
+      i === 0 && seed.overdue > 0 ? 'OVERDUE' : overdueNow ? 'PAID' : i === 0 ? 'PENDING' : 'PAID';
     invoices.push({
       id: `inv_${seed.id}_${i}`,
       number: `FA-0004-${String(12_500 + betweenSeeded(seed.id + i, 1, 400) + i).padStart(8, '0')}`,
@@ -229,10 +231,92 @@ function buildInvoices(seed: Seed): Invoice[] {
       issuedAt: issued,
       dueAt: due,
       total: money(total),
-      status: i === 0 && seed.overdue > 0 ? 'OVERDUE' : overdueNow ? 'PAID' : i === 0 ? 'PENDING' : 'PAID',
+      status,
+      kind: 'INVOICE',
+      letter: 'A',
+      // CAE y vencimiento: en produccion los devuelve AFIP a traves del ERP.
+      cae: `7${betweenSeeded(seed.id + 'cae' + i, 1_000_000_000_000, 9_999_999_999_999)}`,
+      caeExpiresAt: addDays(issued, 10),
+      balance: money(status === 'PAID' ? 0 : total),
+      relatedDocumentId: null,
     });
+
+    // Cada tanto una nota de credito por devolucion o RMA resuelto.
+    if (i > 0 && betweenSeeded(seed.id + 'nc' + i, 0, 10) > 8) {
+      const ncTotal = Math.round(total * (betweenSeeded(seed.id + 'ncp' + i, 8, 34) / 100));
+      invoices.push({
+        id: `nc_${seed.id}_${i}`,
+        number: `NC-0004-${String(3_100 + betweenSeeded(seed.id + 'ncn' + i, 1, 300) + i).padStart(8, '0')}`,
+        orderId: null,
+        issuedAt: addDays(issued, 3),
+        dueAt: addDays(issued, 3),
+        total: money(ncTotal),
+        status: 'PAID',
+        kind: 'CREDIT_NOTE',
+        letter: 'A',
+        cae: `7${betweenSeeded(seed.id + 'ncae' + i, 1_000_000_000_000, 9_999_999_999_999)}`,
+        caeExpiresAt: addDays(issued, 13),
+        balance: money(0),
+        relatedDocumentId: `inv_${seed.id}_${i}`,
+      });
+    }
   }
   return invoices;
+}
+
+/**
+ * Cuenta corriente: los comprobantes suman deuda y los pagos la bajan.
+ * El saldo acumulado se calcula desde el movimiento mas viejo al mas nuevo.
+ */
+export function accountMovements(customerId: string): AccountMovement[] {
+  const customer = CUSTOMERS.find((c) => c.id === customerId);
+  if (!customer) return [];
+
+  const raw = customer.account.invoices.flatMap((doc) => {
+    const sign = doc.kind === 'CREDIT_NOTE' ? -1 : 1;
+    const entries: Omit<AccountMovement, 'runningBalance'>[] = [
+      {
+        id: `mov_${doc.id}`,
+        at: doc.issuedAt,
+        kind: doc.kind,
+        label:
+          doc.kind === 'CREDIT_NOTE'
+            ? 'Nota de crédito'
+            : doc.kind === 'DEBIT_NOTE'
+              ? 'Nota de débito'
+              : 'Factura',
+        reference: doc.number,
+        amount: money(sign * Number.parseFloat(doc.total.amount)),
+        documentId: doc.id,
+        orderId: doc.orderId,
+      },
+    ];
+    // Las facturas saldadas tienen su cobranza registrada.
+    if (doc.kind === 'INVOICE' && doc.status === 'PAID') {
+      entries.push({
+        id: `mov_pay_${doc.id}`,
+        at: addDays(doc.dueAt, -betweenSeeded(doc.id + 'pay', 0, 3)),
+        kind: 'PAYMENT',
+        label: 'Cobranza recibida',
+        reference: `REC-${doc.number.slice(-6)}`,
+        amount: money(-Number.parseFloat(doc.total.amount)),
+        documentId: doc.id,
+        orderId: null,
+      });
+    }
+    return entries;
+  });
+
+  raw.sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime());
+
+  let running = 0;
+  const movements = raw.map((m) => {
+    running += Number.parseFloat(m.amount.amount);
+    return { ...m, runningBalance: money(running) };
+  });
+
+  // Se muestran del mas reciente al mas viejo.
+  return movements.reverse();
 }
 
 export const CUSTOMERS: Customer[] = SEEDS.map((seed, idx) => {

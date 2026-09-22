@@ -27,6 +27,8 @@ const NAV = [
   { to: '/promociones', label: 'Promociones' },
   { to: '/pedidos', label: 'Mis pedidos' },
   { to: '/beneficios', label: 'Beneficios' },
+  { to: '/cuenta', label: 'Mi cuenta' },
+  { to: '/pvp', label: 'Control de PVP' },
   { to: '/rma', label: 'Garantías' },
 ];
 

@@ -191,3 +191,93 @@ describe('costo y margen por rol', () => {
     expect(orders.every((o) => o.customerId === 'cus_gaming_store')).toBe(true);
   });
 });
+
+/* ================================================================== */
+/* control de PVP                                                      */
+/* ================================================================== */
+
+describe('control de PVP', () => {
+  it('un reseller sólo ve sus propias publicaciones', async () => {
+    const mine = await mockClient.retail.observations({}, clientSession('cus_gaming_store'));
+    expect(mine.length).toBeGreaterThan(0);
+    expect(mine.every((o) => o.customerId === 'cus_gaming_store')).toBe(true);
+
+    // Ni siquiera pidiendo explícitamente la cuenta de otro: el precio que
+    // publica un competidor es información comercial de un tercero.
+    const spying = await mockClient.retail.observations(
+      { customerId: 'cus_compumundo' },
+      clientSession('cus_gaming_store'),
+    );
+    expect(spying.every((o) => o.customerId === 'cus_gaming_store')).toBe(true);
+
+    const serialized = JSON.stringify(spying);
+    expect(serialized.toLowerCase()).not.toContain('compumundo');
+  });
+
+  it('un reseller no puede marcar como visto el aviso de otra cuenta', async () => {
+    const others = await mockClient.retail.observations({ customerId: 'cus_compumundo' }, pmSession);
+    const target = others.find((o) => o.customerId === 'cus_compumundo');
+    expect(target).toBeDefined();
+
+    await expect(
+      mockClient.retail.acknowledge(target!.id, clientSession('cus_gaming_store')),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
+  it('un reseller no puede ver ni tocar la conexión de otro', async () => {
+    const feeds = await mockClient.retail.feeds(clientSession('cus_gaming_store'));
+    expect(feeds.every((f) => f.customerId === 'cus_gaming_store')).toBe(true);
+
+    await expect(
+      mockClient.retail.feedForCustomer('cus_compumundo', clientSession('cus_gaming_store')),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
+  it('el PM sólo controla el PVP de sus propias marcas', async () => {
+    const brands = pmSession.brandIds ?? [];
+    expect(brands.length).toBeGreaterThan(0);
+
+    const policies = await mockClient.retail.policies({}, pmSession);
+    expect(policies.length).toBeGreaterThan(0);
+    expect(policies.every((p) => brands.includes(p.brandId))).toBe(true);
+
+    const observations = await mockClient.retail.observations({}, pmSession);
+    expect(observations.every((o) => brands.includes(o.brandId))).toBe(true);
+  });
+
+  it('el PVP no puede quedar por debajo del precio de lista del reseller', async () => {
+    const adminSession = sessionFromUser(INTERNAL_USERS.find((u) => u.role === 'ADMIN')!);
+    const listPrice = num(msiMobo.listPrice);
+
+    await expect(
+      mockClient.retail.upsertPolicy(
+        { productId: msiMobo.id, pvp: (listPrice - 1).toFixed(2), tolerancePct: 3, enforced: true },
+        adminSession,
+      ),
+    ).rejects.toMatchObject({ code: 'VALIDATION_ERROR' });
+  });
+
+  it('cambiar el PVP recalcula los desvíos ya observados', async () => {
+    const adminSession = sessionFromUser(INTERNAL_USERS.find((u) => u.role === 'ADMIN')!);
+    const before = await mockClient.retail.observations({}, adminSession);
+    const sample = before.find((o) => o.status === 'BELOW');
+    expect(sample).toBeDefined();
+
+    // Si el PVP baja hasta el precio que el reseller ya publica, el desvío
+    // desaparece: el precio publicado no cambió, cambió la referencia.
+    await mockClient.retail.upsertPolicy(
+      {
+        productId: sample!.productId,
+        pvp: sample!.publishedPrice.amount,
+        tolerancePct: 5,
+        enforced: false,
+      },
+      adminSession,
+    );
+
+    const after = await mockClient.retail.observations({}, adminSession);
+    const updated = after.find((o) => o.id === sample!.id)!;
+    expect(updated.status).toBe('OK');
+    expect(Math.abs(updated.deviationPct)).toBeLessThanOrEqual(5);
+  });
+});

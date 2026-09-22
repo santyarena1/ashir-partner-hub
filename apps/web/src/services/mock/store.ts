@@ -13,6 +13,9 @@ import type {
   IntegrationRun,
   Notification,
   Order,
+  ResellerFeed,
+  RetailObservation,
+  RetailPolicy,
   RmaCase,
   SerialRecord,
   SpecialPriceRequest,
@@ -30,6 +33,7 @@ import {
   WEBHOOK_DELIVERIES,
 } from '@/mocks/fixtures/platform';
 import { SERIALS } from '@/mocks/fixtures/serials';
+import { RESELLER_FEEDS, RETAIL_OBSERVATIONS, RETAIL_POLICIES } from '@/mocks/fixtures/retail';
 
 const STORAGE_KEY = 'ashir-partner-hub:demo-state:v1';
 const SCENARIO_KEY = 'ashir-partner-hub:demo-scenarios:v1';
@@ -45,6 +49,9 @@ export interface DemoState {
   webhooks: WebhookDelivery[];
   imports: ImportRun[];
   serials: SerialRecord[];
+  retailPolicies: RetailPolicy[];
+  resellerFeeds: ResellerFeed[];
+  retailObservations: RetailObservation[];
   /** Puntos canjeados durante la demo, por cliente. */
   redeemedBenefits: Record<string, string[]>;
 }
@@ -61,6 +68,9 @@ function pristine(): DemoState {
     webhooks: structuredClone(WEBHOOK_DELIVERIES),
     imports: structuredClone(IMPORT_RUNS),
     serials: structuredClone(SERIALS),
+    retailPolicies: structuredClone(RETAIL_POLICIES),
+    resellerFeeds: structuredClone(RESELLER_FEEDS),
+    retailObservations: structuredClone(RETAIL_OBSERVATIONS),
     redeemedBenefits: {},
   };
 }
