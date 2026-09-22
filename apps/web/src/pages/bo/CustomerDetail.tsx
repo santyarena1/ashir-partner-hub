@@ -28,6 +28,7 @@ import { priceListById } from '@/mocks/fixtures/pricing';
 import { personName } from '@/mocks/fixtures/people';
 import { PAYMENT_TERM } from '@/lib/labels';
 import { can } from '@/lib/rbac';
+import { AssistButton } from '@/components/domain/assist-bar';
 import { cn, fmtDate, fmtMoney, fmtNumber, fmtRelative, num } from '@/lib/utils';
 import {
   Badge,
@@ -249,6 +250,7 @@ export function BoCustomerDetail() {
             <Button variant="outline" icon={<Mail className="size-4" />} onClick={() => toast.simulated('El envío de correo al cliente')}>
               Contactar
             </Button>
+            <AssistButton customerId={c.id} variant="primary" label="Armar pedido por el cliente" />
           </>
         }
       />

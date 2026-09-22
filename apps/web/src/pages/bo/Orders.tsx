@@ -3,7 +3,7 @@
  */
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ListOrdered, Search } from 'lucide-react';
+import { ListOrdered, Search, UserCog } from 'lucide-react';
 import type { Order, OrderStatus } from '@/types';
 import { api } from '@/services';
 import { useSession } from '@/app/session';
@@ -67,6 +67,12 @@ export function BoOrders() {
             {fmtDate(o.createdAt)}
             {o.customerPO && ` · OC ${o.customerPO}`}
           </p>
+          {o.origin === 'ASSISTED' && o.placedBy && (
+            <p className="mt-0.5 flex items-center gap-1 text-[11px] text-ink-500">
+              <UserCog className="size-3 shrink-0 text-ashir-500" aria-hidden />
+              <span className="truncate">Cargado por {o.placedBy.name}</span>
+            </p>
+          )}
         </div>
       ),
       sortable: true,

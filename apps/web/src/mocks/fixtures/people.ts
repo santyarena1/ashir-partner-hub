@@ -130,3 +130,16 @@ export function personName(id: string | null | undefined): string {
 export function pmById(id: string): ProductManager | undefined {
   return PRODUCT_MANAGERS.find((p) => p.id === id);
 }
+
+/**
+ * Cargo de una persona interna. Los ejecutivos comerciales que no son
+ * usuarios de la demo comparten el mismo puesto.
+ */
+export function personJobTitle(id: string | null | undefined): string {
+  if (!id) return '—';
+  const internal = INTERNAL_USERS.find((u) => u.id === id);
+  if (internal) return internal.jobTitle;
+  if (PRODUCT_MANAGERS.some((p) => p.id === id)) return 'Product Manager';
+  if (RMA_TECHNICIANS.some((t) => t.id === id)) return 'Técnico de RMA';
+  return 'Ejecutivo comercial';
+}

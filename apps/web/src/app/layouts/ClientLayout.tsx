@@ -19,6 +19,7 @@ import { Kbd } from '@/components/ui/primitives';
 import { CUSTOMERS } from '@/mocks/fixtures/customers';
 import { personName } from '@/mocks/fixtures/people';
 import { AshirLogo } from '@/components/domain/logo';
+import { AssistBar } from '@/components/domain/assist-bar';
 
 const NAV = [
   { to: '/catalogo', label: 'Productos' },
@@ -39,6 +40,8 @@ export function ClientLayout() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-white">
+      <AssistBar />
+
       {/* ---------------- barra de utilidades ---------------- */}
       <div className="hidden border-b border-ink-100 bg-ink-50 sm:block">
         <div className="mx-auto flex h-9 max-w-[1320px] items-center justify-between gap-4 px-4 text-[11px] text-ink-500 sm:px-6">
@@ -62,7 +65,7 @@ export function ClientLayout() {
       </div>
 
       {/* ---------------- header principal ---------------- */}
-      <header className="sticky top-0 z-60 border-b border-ink-100 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-ink-100 bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-18 max-w-[1320px] items-center gap-4 px-4 sm:px-6">
           <Link to="/" className="shrink-0" aria-label="Ashir Partner Hub · inicio">
             <AshirLogo className="h-10" tone="dark" />

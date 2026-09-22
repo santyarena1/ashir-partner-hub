@@ -6,7 +6,7 @@
  * a `cost:read` ni a `margin:read`, y toda vista que muestre costo o margen
  * se renderiza detras de `can()`.
  */
-import type { Role, Scope, Session, InternalUser } from '@/types';
+import type { Role, Scope, Session, InternalUser, OnBehalfOf } from '@/types';
 
 const CLIENT_SCOPES: Scope[] = [
   'catalog:read',
@@ -127,7 +127,11 @@ export function ownsBrand(session: Session | null, brandId: string): boolean {
   return (session.brandIds ?? []).includes(brandId);
 }
 
-export function sessionFromUser(user: InternalUser, customerId?: string): Session {
+export function sessionFromUser(
+  user: InternalUser,
+  customerId?: string,
+  onBehalfOf?: OnBehalfOf | null,
+): Session {
   return {
     userId: user.id,
     name: user.name,
@@ -137,7 +141,28 @@ export function sessionFromUser(user: InternalUser, customerId?: string): Sessio
     avatarInitials: user.initials,
     scopes: SCOPES_BY_ROLE[user.role],
     customerId,
+    onBehalfOf: onBehalfOf ?? null,
     brandIds: user.brandIds,
     jobTitle: user.jobTitle,
   };
+}
+
+/**
+ * Roles que pueden operar el portal en nombre de un reseller.
+ *
+ * Es una funcion de asistencia comercial, no un cambio de identidad: la
+ * sesion conserva los permisos del interno y la auditoria guarda su nombre.
+ */
+export function canActOnBehalf(session: Session | null): boolean {
+  if (!session) return false;
+  return session.role === 'SALES' || session.role === 'ADMIN';
+}
+
+/**
+ * true si la cuenta de reseller en contexto manda sobre los listados:
+ * el propio cliente, o un interno asistiendolo.
+ */
+export function isCustomerScoped(session: Session | null): boolean {
+  if (!session) return false;
+  return session.role === 'CLIENT' || Boolean(session.onBehalfOf);
 }

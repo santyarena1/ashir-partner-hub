@@ -10,6 +10,8 @@ import { Check, ChevronDown, Eye, Headset, LayoutDashboard, ShieldCheck, Store, 
 import type { Role } from '@/types';
 import { ROLE_LABEL } from '@/lib/labels';
 import { useSession } from '@/app/session';
+import { useCart } from '@/app/cart';
+import { canActOnBehalf } from '@/lib/rbac';
 import { CUSTOMERS } from '@/mocks/fixtures/customers';
 import { cn } from '@/lib/utils';
 import { Avatar } from '@/components/ui/primitives';
@@ -40,7 +42,8 @@ export const ROLE_HOME: Record<Role, string> = {
 };
 
 export function RoleSwitcher({ variant = 'dark' }: { variant?: 'dark' | 'light' }) {
-  const { role, setRole, session, setCustomerId } = useSession();
+  const { role, setRole, session, setCustomerId, assisting, startAssist, stopAssist } = useSession();
+  const cart = useCart();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -133,6 +136,40 @@ export function RoleSwitcher({ variant = 'dark' }: { variant?: 'dark' | 'light' 
               );
             })}
           </ul>
+
+          {canActOnBehalf(session) && (
+            <div className="border-t border-ink-100 bg-ink-50 p-3">
+              <label htmlFor="assist-customer" className="text-[11px] font-semibold tracking-wide text-ink-500 uppercase">
+                Operar en nombre de un cliente
+              </label>
+              <p className="mt-1 text-[11px] leading-snug text-ink-500">
+                Para cargarle el pedido cuando te lo pide por teléfono o WhatsApp. Queda registrado a tu nombre.
+              </p>
+              <select
+                id="assist-customer"
+                value={assisting?.customerId ?? ''}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  setOpen(false);
+                  cart.clear();
+                  if (!id) {
+                    stopAssist();
+                    return;
+                  }
+                  startAssist(id);
+                  navigate('/');
+                }}
+                className="mt-1.5 h-8 w-full rounded-lg border border-ink-200 bg-white px-2 text-[13px] text-ink-800"
+              >
+                <option value="">— No asistir a nadie —</option>
+                {CUSTOMERS.filter((c) => c.status !== 'PROSPECT').map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.tradeName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {role === 'CLIENT' && (
             <div className="border-t border-ink-100 bg-ink-50 p-3">

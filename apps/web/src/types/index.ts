@@ -67,6 +67,16 @@ export type Scope =
   | 'margin:read'
   | 'audit:read';
 
+/** Asistencia de un rol interno sobre la cuenta de un reseller. */
+export interface OnBehalfOf {
+  customerId: string;
+  customerName: string;
+  /** Usuario interno que esta operando. */
+  userId: string;
+  userName: string;
+  startedAt: string;
+}
+
 export interface Session {
   userId: string;
   name: string;
@@ -75,8 +85,17 @@ export interface Session {
   roleLabel: string;
   avatarInitials: string;
   scopes: Scope[];
-  /** Solo para el rol CLIENT: la cuenta de reseller autenticada. */
+  /**
+   * Cuenta de reseller en contexto: la propia cuando el rol es CLIENT, o la
+   * que un rol interno esta asistiendo (ver `onBehalfOf`).
+   */
   customerId?: string;
+  /**
+   * Presente cuando un rol interno (comercial, admin) opera el portal en
+   * nombre de un reseller. El pedido se registra a nombre del cliente, pero
+   * la auditoria guarda quien lo cargo.
+   */
+  onBehalfOf?: OnBehalfOf | null;
   /** Marcas a cargo, solo para PM. */
   brandIds?: string[];
   jobTitle: string;
@@ -464,6 +483,10 @@ export interface Order {
   appliedConditions: { conditionId: string; code: string; name: string; effect: string }[];
   requiredApprovals: { type: string; label: string; status: 'PENDING' | 'APPROVED' | 'REJECTED'; approver: string | null }[];
   salesRepId: string;
+  /** Canal de alta: el propio reseller o un interno operando por el. */
+  origin: 'PORTAL' | 'ASSISTED';
+  /** Usuario interno que cargo el pedido, cuando `origin` es ASSISTED. */
+  placedBy: { userId: string; name: string; jobTitle: string } | null;
   createdAt: string;
   updatedAt: string;
   confirmedAt: string | null;
@@ -1129,9 +1152,11 @@ export interface AuditEvent {
   entityId: string;
   previousValue: string | null;
   newValue: string | null;
-  origin: 'PORTAL' | 'API' | 'ERP' | 'IMPORT' | 'SYSTEM';
+  origin: 'PORTAL' | 'API' | 'ERP' | 'IMPORT' | 'SYSTEM' | 'BACKOFFICE';
   requestId: string;
   comment: string | null;
+  /** Reseller en cuyo nombre actuo un usuario interno, si aplica. */
+  onBehalfOf?: string | null;
 }
 
 export interface InternalUser {

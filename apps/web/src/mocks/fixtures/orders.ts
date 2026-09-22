@@ -10,7 +10,7 @@ import { CUSTOMERS } from '@/mocks/fixtures/customers';
 import { SELLABLE_PRODUCTS, productBySku } from '@/mocks/fixtures/catalog';
 import { evaluatePrice, estimateFreight } from '@/services/mock/pricing-engine';
 import { addDays, betweenSeeded, money, num, requestId, seeded } from '@/lib/utils';
-import { personName } from '@/mocks/fixtures/people';
+import { personJobTitle, personName } from '@/mocks/fixtures/people';
 
 const NOW = new Date('2026-09-22T11:00:00-03:00').toISOString();
 
@@ -293,6 +293,18 @@ function buildOrder(index: number, status: OrderStatus, numberSeq: number): Orde
     appliedConditions: evaluation.appliedConditions,
     requiredApprovals,
     salesRepId: customer.salesRepId,
+    // Parte de los pedidos historicos los cargo el ejecutivo por el cliente:
+    // es el flujo de «me lo pidio por WhatsApp y se lo armo yo».
+    ...(betweenSeeded(`${seed}origin`, 0, 10) > 7
+      ? {
+          origin: 'ASSISTED' as const,
+          placedBy: {
+            userId: customer.salesRepId,
+            name: personName(customer.salesRepId),
+            jobTitle: personJobTitle(customer.salesRepId),
+          },
+        }
+      : { origin: 'PORTAL' as const, placedBy: null }),
     createdAt,
     updatedAt: auditLog[auditLog.length - 1]!.at,
     confirmedAt: status === 'DRAFT' ? null : addDays(createdAt, 0.02),
@@ -443,6 +455,8 @@ function buildHeroOrder(): Order {
       { type: 'SPECIAL_PRICE', label: 'Precio especial PE-1042', status: 'APPROVED', approver: 'Diego Sanabria' },
     ],
     salesRepId: 'usr_martin',
+    origin: 'PORTAL',
+    placedBy: null,
     createdAt,
     updatedAt: '2026-03-17T11:40:00-03:00',
     confirmedAt: '2026-03-14T11:37:00-03:00',

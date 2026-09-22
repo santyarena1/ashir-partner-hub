@@ -24,6 +24,7 @@ import {
   type Column,
 } from '@/components/ui/data';
 import { SegmentBadge } from '@/components/domain/common';
+import { AssistButton } from '@/components/domain/assist-bar';
 
 export function BoCustomers() {
   const { role, session } = useSession();
@@ -164,6 +165,16 @@ export function BoCustomers() {
       ),
       sortable: true,
       sortValue: (c) => (c.lastOrderAt ? new Date(c.lastOrderAt).getTime() : 0),
+    },
+    {
+      key: 'assist',
+      header: '',
+      align: 'right',
+      hideOnMobile: true,
+      cell: (c) =>
+        c.status === 'PROSPECT' ? null : (
+          <AssistButton customerId={c.id} size="sm" variant="ghost" label="Armar pedido" />
+        ),
     },
   ];
 

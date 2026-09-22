@@ -50,7 +50,7 @@ import { ALLOWED_MODIFICATIONS } from '@/mocks/fixtures/orders';
 import { evaluatePrice, estimateFreight, simulateCondition } from '@/services/mock/pricing-engine';
 import { brandDashboard, commercialSimulation, rmaAnalytics } from '@/services/mock/analytics';
 import { fastLatency, getState, isScenarioOn, latency, mutate } from '@/services/mock/store';
-import { can, ownsBrand } from '@/lib/rbac';
+import { can, isCustomerScoped, ownsBrand } from '@/lib/rbac';
 import { RMA_PROBLEM, RMA_FLOW } from '@/lib/labels';
 import {
   addDays,
@@ -565,12 +565,17 @@ function pushAudit(order: Order, session: Session, action: string, extra: Partia
       at: now(),
       actor: session.role === 'CLIENT' ? (customerById(session.customerId ?? '')?.tradeName ?? session.name) : session.name,
       actorRole: session.role,
+      /**
+       * Cuando un interno opera en nombre del cliente, la traza guarda a
+       * los dos: el pedido es del reseller, la accion es del vendedor.
+       */
+      onBehalfOf: session.onBehalfOf?.customerName ?? null,
       action,
       entity: 'Order',
       entityId: order.id,
       previousValue: null,
       newValue: null,
-      origin: 'PORTAL',
+      origin: session.onBehalfOf ? 'BACKOFFICE' : session.role === 'CLIENT' ? 'PORTAL' : 'BACKOFFICE',
       requestId: requestId(),
       comment: null,
       ...extra,
@@ -582,7 +587,8 @@ const orders: ApiClient['orders'] = {
   async list(filter, session) {
     await latency();
     let items = getState().orders;
-    if (session.role === 'CLIENT') {
+    if (isCustomerScoped(session)) {
+      // Cliente propio o interno asistiendo: solo la cuenta en contexto.
       items = items.filter((o) => o.customerId === session.customerId);
     } else if (filter.customerId) {
       items = items.filter((o) => o.customerId === filter.customerId);
@@ -604,7 +610,7 @@ const orders: ApiClient['orders'] = {
     await fastLatency();
     const order = getState().orders.find((o) => o.id === id || o.number === id);
     if (!order) throw new ServiceError(ERROR_CODES.NOT_FOUND, 'Pedido inexistente.', 404, [], requestId());
-    if (session.role === 'CLIENT' && order.customerId !== session.customerId) {
+    if (isCustomerScoped(session) && order.customerId !== session.customerId) {
       throw new ServiceError(ERROR_CODES.FORBIDDEN, 'El pedido pertenece a otra cuenta.', 403, [], requestId());
     }
     return order;
@@ -676,6 +682,10 @@ const orders: ApiClient['orders'] = {
       appliedConditions: [],
       requiredApprovals: [],
       salesRepId: customer.salesRepId,
+      origin: session.onBehalfOf ? 'ASSISTED' : 'PORTAL',
+      placedBy: session.onBehalfOf
+        ? { userId: session.userId, name: session.name, jobTitle: session.jobTitle }
+        : null,
       createdAt: now(),
       updatedAt: now(),
       confirmedAt: null,
@@ -687,7 +697,14 @@ const orders: ApiClient['orders'] = {
       allowedModifications: ALLOWED_MODIFICATIONS.DRAFT,
     };
 
-    pushAudit(base, session, 'Pedido creado desde el portal', { newValue: 'DRAFT' });
+    pushAudit(
+      base,
+      session,
+      session.onBehalfOf
+        ? `Pedido creado por ${session.name} en nombre del cliente`
+        : 'Pedido creado desde el portal',
+      { newValue: 'DRAFT' },
+    );
     const order = recalcOrder(base, customer);
 
     // Aprobacion requerida si supera el credito disponible.
@@ -711,7 +728,9 @@ const orders: ApiClient['orders'] = {
           customerId: null,
           kind: 'ORDER',
           title: `Nuevo pedido ${order.number}`,
-          body: `${customer.tradeName} creó un pedido por USD ${order.total.amount}.`,
+          body: session.onBehalfOf
+            ? `${session.name} cargó un pedido de ${customer.tradeName} por USD ${order.total.amount}.`
+            : `${customer.tradeName} creó un pedido por USD ${order.total.amount}.`,
           at: now(),
           read: false,
           href: `/bo/pedidos/${order.id}`,

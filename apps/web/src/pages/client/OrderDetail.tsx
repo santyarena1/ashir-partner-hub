@@ -389,6 +389,10 @@ export function OrderDetailPage() {
                 <DataRow label="Condición de pago" value={PAYMENT_TERM[o.paymentTerm].label} />
                 <DataRow label="Entrega" value={o.deliveryMethod === 'PICKUP' ? 'Retiro en depósito' : 'Envío a domicilio'} />
                 <DataRow label="Ejecutivo" value={personName(o.salesRepId)} />
+                <DataRow
+                  label="Cargado por"
+                  value={o.origin === 'ASSISTED' && o.placedBy ? `${o.placedBy.name} (Ashir)` : 'Vos, desde el portal'}
+                />
                 {customer && <DataRow label="Lista aplicada" value={customer.priceListId.replace('pl_', 'LP-').toUpperCase()} />}
               </div>
               {o.deliveryMethod === 'DELIVERY' && (

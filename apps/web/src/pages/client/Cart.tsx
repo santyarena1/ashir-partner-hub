@@ -400,14 +400,19 @@ export function CartPage() {
                 setConfirming(false);
                 if (order) {
                   cart.clear();
-                  toast.success(`Pedido ${order.number} confirmado`, 'Ya podés seguir su estado desde Mis pedidos.');
+                  toast.success(
+                    `Pedido ${order.number} confirmado`,
+                    session.onBehalfOf
+                      ? `Queda a nombre de ${session.onBehalfOf.customerName} y figura como cargado por vos.`
+                      : 'Ya podés seguir su estado desde Mis pedidos.',
+                  );
                   navigate(`/pedidos/${order.id}`);
                 } else if (submit.error) {
                   toast.error('No pudimos confirmar el pedido', submit.error.message);
                 }
               }}
             >
-              Confirmar pedido
+              {session.onBehalfOf ? `Confirmar pedido de ${session.onBehalfOf.customerName}` : 'Confirmar pedido'}
             </Button>
             <Link to="/catalogo" className="block">
               <Button variant="outline" className="w-full">

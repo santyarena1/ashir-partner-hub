@@ -150,7 +150,11 @@ export function BoOrderDetail() {
       <PageHeader
         breadcrumbs={[{ label: 'Pedidos', href: '/bo/pedidos' }, { label: o.number }]}
         title={`${o.number} · ${o.customerName}`}
-        subtitle={`Creado el ${fmtDateTime(o.createdAt)} · versión ${o.version} · ejecutivo ${personName(o.salesRepId)}`}
+        subtitle={`Creado el ${fmtDateTime(o.createdAt)} · ${
+          o.origin === 'ASSISTED' && o.placedBy
+            ? `cargado por ${o.placedBy.name} en nombre del cliente`
+            : 'cargado por el cliente desde el portal'
+        } · versión ${o.version} · ejecutivo ${personName(o.salesRepId)}`}
         badge={<OrderStatusBadge status={o.status} />}
         actions={
           canApprove && options.length > 0 ? (
