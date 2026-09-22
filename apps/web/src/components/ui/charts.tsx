@@ -138,7 +138,7 @@ export function TrendArea<T extends Record<string, unknown>>({
 }) {
   const gradientId = `grad-${yKey}-${color.replace('#', '')}`;
   return (
-    <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -18 }}>
+    <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity={0.22} />
@@ -149,7 +149,7 @@ export function TrendArea<T extends Record<string, unknown>>({
       <XAxis dataKey={xKey} {...AXIS} />
       <YAxis {...AXIS} tickFormatter={(v: number) => compactNumber(v)} width={52} />
       <RTooltip content={<ChartTooltip formatter={formatter ? (v) => formatter(v) : undefined} />} />
-      <Area type="monotone" dataKey={yKey} stroke={color} strokeWidth={2} fill={`url(#${gradientId})`} />
+      <Area type="monotone" dataKey={yKey} stroke={color} strokeWidth={2} fill={`url(#${gradientId})`} isAnimationActive={false} />
     </AreaChart>
   );
 }
@@ -166,7 +166,7 @@ export function MultiLine<T extends Record<string, unknown>>({
   formatter?: (v: number, name: string) => string;
 }) {
   return (
-    <LineChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -18 }}>
+    <LineChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
       <CartesianGrid {...GRID} />
       <XAxis dataKey={xKey} {...AXIS} />
       <YAxis {...AXIS} tickFormatter={(v: number) => compactNumber(v)} width={52} />
@@ -180,6 +180,7 @@ export function MultiLine<T extends Record<string, unknown>>({
           stroke={s.color ?? CHART_COLORS[i % CHART_COLORS.length]}
           strokeWidth={2}
           dot={false}
+          isAnimationActive={false}
         />
       ))}
     </LineChart>
@@ -210,7 +211,7 @@ export function Bars<T extends Record<string, unknown>>({
         <XAxis type="number" {...AXIS} tickFormatter={(v: number) => compactNumber(v)} />
         <YAxis type="category" dataKey={xKey} {...AXIS} width={128} />
         <RTooltip cursor={{ fill: '#f6f7f8' }} content={<ChartTooltip formatter={formatter ? (v) => formatter(v) : undefined} />} />
-        <Bar dataKey={yKey} radius={[0, 4, 4, 0]} maxBarSize={22}>
+        <Bar dataKey={yKey} radius={[0, 4, 4, 0]} maxBarSize={22} isAnimationActive={false}>
           {data.map((row, i) => (
             <Cell key={i} fill={colorByIndex ? colorByIndex(row, i) : color} />
           ))}
@@ -219,12 +220,12 @@ export function Bars<T extends Record<string, unknown>>({
     );
   }
   return (
-    <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -18 }}>
+    <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
       <CartesianGrid {...GRID} />
       <XAxis dataKey={xKey} {...AXIS} />
       <YAxis {...AXIS} tickFormatter={(v: number) => compactNumber(v)} width={52} />
       <RTooltip cursor={{ fill: '#f6f7f8' }} content={<ChartTooltip formatter={formatter ? (v) => formatter(v) : undefined} />} />
-      <Bar dataKey={yKey} radius={[4, 4, 0, 0]} maxBarSize={38}>
+      <Bar dataKey={yKey} radius={[4, 4, 0, 0]} maxBarSize={38} isAnimationActive={false}>
         {data.map((row, i) => (
           <Cell key={i} fill={colorByIndex ? colorByIndex(row, i) : color} />
         ))}
@@ -253,10 +254,15 @@ export function Donut<T extends Record<string, unknown>>({
         data={data}
         dataKey={valueKey}
         nameKey={nameKey}
+        cx="50%"
+        cy="50%"
         innerRadius="58%"
         outerRadius="82%"
         paddingAngle={2}
         strokeWidth={0}
+        // Sin animación: cuando el donut monta fuera de la pantalla, la
+        // animación de entrada se queda con radio 0 y el gráfico nunca aparece.
+        isAnimationActive={false}
       >
         {data.map((_, i) => (
           <Cell key={i} fill={colors[i % colors.length]} />

@@ -279,6 +279,21 @@ cantidad. Están corregidos.
 
 ---
 
+## Dos identidades visuales
+
+El portal del reseller y el backoffice **no se parecen a propósito**:
+
+- **Portal de cliente** — blanco, aireado, con el naranja Ashir como único
+  acento. La imagen del producto manda, el precio se lee de lejos y el
+  buscador es el elemento más prominente del header. Es un lugar para comprar.
+- **Backoffice** — charcoal, denso, orientado a tablas y a operar rápido. Es
+  una herramienta de trabajo.
+
+Mezclarlas fue el primer intento y el resultado era que el marketplace parecía
+un panel de administración.
+
+---
+
 ## Accesibilidad y responsive
 
 - Contraste AA, navegación por teclado, foco visible y `aria-label` en controles.

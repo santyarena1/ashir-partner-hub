@@ -260,7 +260,7 @@ export function Catalog() {
                     aria-current={page === data.meta.page ? 'page' : undefined}
                     className={cn(
                       'size-8 rounded-lg text-[13px] font-medium tabular-nums transition-colors',
-                      page === data.meta.page ? 'bg-ink-900 text-white' : 'text-ink-600 hover:bg-ink-100',
+                      page === data.meta.page ? 'bg-ashir-600 text-white' : 'text-ink-600 hover:bg-ink-100',
                     )}
                   >
                     {page}
