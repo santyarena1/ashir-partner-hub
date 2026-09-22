@@ -42,8 +42,8 @@ export function PromotionsPage() {
 
       {customer && (
         <Callout tone="tech" icon={<Info className="size-4" />} className="mb-6">
-          Estás viendo las condiciones aplicables a <strong>{customer.tradeName}</strong> — segmento{' '}
-          {customer.segment}, zona {customer.zone}, condición de pago habitual{' '}
+          Estás viendo las condiciones aplicables a <strong>{customer.tradeName}</strong> — zona{' '}
+          {customer.zone}, condición de pago habitual{' '}
           {customer.paymentTerm === 'CASH' ? 'contado' : customer.paymentTerm.toLowerCase().replace('_', ' ')}. Los
           descuentos se aplican automáticamente al armar el pedido.
         </Callout>

@@ -333,7 +333,7 @@ export function ProductDetail() {
         {/* ---------------- columna derecha: precio ---------------- */}
         <div className="lg:sticky lg:top-32 lg:self-start">
           <Card>
-            <CardHeader title="Tu precio" subtitle={customer ? `Lista ${customer.priceListId.replace('pl_', 'LP-').toUpperCase()} · ${customer.segment}` : undefined} icon={<Tag className="size-4" />} />
+            <CardHeader title="Tu precio" subtitle={customer ? `Lista ${customer.priceListId.replace('pl_', 'LP-').toUpperCase()}` : undefined} icon={<Tag className="size-4" />} />
 
             <div className="p-5">
               {!p.listPrice ? (

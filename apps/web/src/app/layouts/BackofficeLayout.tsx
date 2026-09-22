@@ -200,7 +200,7 @@ export function BackofficeLayout() {
       >
         <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-ink-800 px-4">
           <Link to="/bo" aria-label="Backoffice · inicio">
-            <AshirLogo className="h-7" />
+            <AshirLogo className="h-9" />
           </Link>
           <button
             type="button"

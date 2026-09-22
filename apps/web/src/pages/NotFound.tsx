@@ -7,7 +7,7 @@ import { AshirLogo } from '@/components/domain/logo';
 export function NotFound() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-ink-50 px-4">
-      <AshirLogo className="mb-6 h-8" tone="dark" />
+      <AshirLogo className="mb-6 h-24" tone="dark" stacked />
       <Card className="w-full max-w-lg">
         <EmptyState
           title="No encontramos esta pantalla"

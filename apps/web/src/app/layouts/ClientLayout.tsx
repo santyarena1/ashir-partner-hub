@@ -15,7 +15,7 @@ import { RoleSwitcher } from '@/components/domain/role-switcher';
 import { NotificationBell } from '@/components/domain/notifications';
 import { CommandPalette, useCommandPalette } from '@/components/domain/command-palette';
 import { DemoModeChip } from '@/components/domain/common';
-import { Badge, Kbd } from '@/components/ui/primitives';
+import { Kbd } from '@/components/ui/primitives';
 import { CUSTOMERS } from '@/mocks/fixtures/customers';
 import { personName } from '@/mocks/fixtures/people';
 import { AshirLogo } from '@/components/domain/logo';
@@ -65,7 +65,7 @@ export function ClientLayout() {
       <header className="sticky top-0 z-60 border-b border-ink-100 bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-18 max-w-[1320px] items-center gap-4 px-4 sm:px-6">
           <Link to="/" className="shrink-0" aria-label="Ashir Partner Hub · inicio">
-            <AshirLogo className="h-9" tone="dark" />
+            <AshirLogo className="h-10" tone="dark" />
           </Link>
 
           {/* buscador protagonista */}
@@ -163,12 +163,6 @@ export function ClientLayout() {
               <span className="ml-auto flex items-center gap-2 py-2 text-[11px] text-ink-400">
                 Comprando como
                 <span className="font-semibold text-ink-700">{customer.tradeName}</span>
-                <Badge
-                  tone={customer.segment === 'PLATINUM' ? 'plat' : customer.segment === 'GOLD' ? 'warn' : 'neutral'}
-                  size="sm"
-                >
-                  {customer.segment}
-                </Badge>
               </span>
             )}
           </div>
@@ -210,7 +204,7 @@ export function ClientLayout() {
         <div className="mx-auto max-w-[1320px] px-4 py-10 sm:px-6">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <AshirLogo className="h-8" tone="dark" />
+              <AshirLogo className="h-10" tone="dark" />
               <p className="mt-3 max-w-xs text-xs leading-relaxed text-ink-500">
                 Prototipo de presentación del Ashir Partner Hub. El catálogo proviene de la lista de distribuidor real;
                 el resto de la información es simulada para la demostración.

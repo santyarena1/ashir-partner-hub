@@ -36,7 +36,7 @@ import {
   StatGrid,
   StatTile,
 } from '@/components/ui/data';
-import { OrderStatusBadge, SegmentBadge, SyncStamp } from '@/components/domain/common';
+import { OrderStatusBadge, SyncStamp } from '@/components/domain/common';
 import { ProductCard, ProductCardSkeleton } from '@/components/domain/product-card';
 import { useCart } from '@/app/cart';
 import { useToast } from '@/components/ui/overlays';
@@ -154,9 +154,6 @@ export function ClientDashboard() {
             <span className="flex items-center gap-1.5">
               Ejecutivo asignado:
               <span className="font-medium text-ink-800">{personName(customer.salesRepId)}</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              Segmento: <SegmentBadge segment={customer.segment} size="sm" />
             </span>
             <span>
               Lista: <code className="rounded bg-ink-100 px-1.5 py-0.5 font-mono text-[11px]">{customer.priceListId.replace('pl_', 'LP-').toUpperCase()}</code>

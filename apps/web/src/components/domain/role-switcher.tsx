@@ -12,7 +12,7 @@ import { ROLE_LABEL } from '@/lib/labels';
 import { useSession } from '@/app/session';
 import { CUSTOMERS } from '@/mocks/fixtures/customers';
 import { cn } from '@/lib/utils';
-import { Avatar, Badge } from '@/components/ui/primitives';
+import { Avatar } from '@/components/ui/primitives';
 
 const ROLE_ICON: Record<Role, typeof Store> = {
   CLIENT: Store,
@@ -147,15 +147,12 @@ export function RoleSwitcher({ variant = 'dark' }: { variant?: 'dark' | 'light' 
               >
                 {CUSTOMERS.filter((c) => c.status !== 'PROSPECT').map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.tradeName} · {c.segment}
+                    {c.tradeName}
                   </option>
                 ))}
               </select>
               {customer && (
                 <p className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-ink-500">
-                  <Badge tone={customer.segment === 'PLATINUM' ? 'plat' : customer.segment === 'GOLD' ? 'warn' : 'neutral'} size="sm">
-                    {customer.segment}
-                  </Badge>
                   <span>Lista {customer.priceListId.replace('pl_', '').toUpperCase()}</span>
                 </p>
               )}

@@ -63,7 +63,7 @@ export function DocsPage() {
       <header className="sticky top-0 z-60 border-b border-ink-800 bg-ink-900">
         <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 sm:px-6">
           <Link to="/" className="shrink-0">
-            <AshirLogo className="h-7" />
+            <AshirLogo className="h-9" />
           </Link>
           <span className="hidden text-[13px] font-medium text-ink-300 sm:block">Centro de Desarrolladores</span>
 
