@@ -194,7 +194,7 @@ export function BackofficeLayout() {
       {/* --- sidebar --- */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-80 flex w-[248px] flex-col bg-ink-900 transition-transform lg:static lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-80 flex w-[248px] flex-col bg-ink-900 transition-transform lg:sticky lg:inset-auto lg:top-0 lg:h-dvh lg:self-start lg:translate-x-0',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
