@@ -169,25 +169,15 @@ export function ProductDetail() {
         <div className="min-w-0 space-y-5">
           <Card className="p-5">
             <div className="flex flex-col gap-5 sm:flex-row">
-              <div className="w-full shrink-0 sm:w-56">
-                <ProductTile product={p} size="lg" />
-                <div className="mt-2 grid grid-cols-3 gap-2">
-                  {/* Galería: el archivo de Ashir no trae imágenes, se muestran
-                      marcos vacíos rotulados para no inventar fotos. */}
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="flex aspect-square items-center justify-center rounded-md border border-dashed border-ink-200 text-[9px] leading-tight text-ink-300"
-                    >
-                      Sin
-                      <br />
-                      imagen
-                    </div>
-                  ))}
+              <div className="w-full shrink-0 sm:w-72">
+                {/* El archivo de distribuidor no trae imágenes: en lugar de
+                    inventar fotos se compone un tile con la marca. */}
+                <div className="rounded-xl border border-ink-150 border-ink-200 bg-white p-6">
+                  <ProductTile product={p} size="lg" className="border-0" />
                 </div>
-                <p className="mt-2 text-[11px] leading-snug text-ink-400">
-                  La lista de distribuidor no incluye imágenes de producto. En producción se cargarían desde el ERP
-                  o desde el material de cada marca.
+                <p className="mt-2.5 text-[11px] leading-snug text-ink-400">
+                  La lista de distribuidor no incluye imágenes de producto. En producción se cargarían desde el ERP o
+                  desde el material de cada marca.
                 </p>
               </div>
 
@@ -381,12 +371,22 @@ export function ProductDetail() {
                         </span>
                       </div>
                     ))}
-                    <div className="mt-2 flex items-baseline justify-between gap-3 border-t border-ink-200 pt-2">
-                      <span className="font-sans text-[13px] font-semibold tracking-wide text-ink-900 uppercase">Tu precio</span>
-                      <span className="font-sans text-lg font-semibold tabular-nums text-ink-900">
-                        {fmtMoney(evaluation.data.finalUnitPrice)}
-                      </span>
-                    </div>
+                  </div>
+
+                  {/* --- precio final, destacado --- */}
+                  <div className="mt-3 rounded-xl bg-ashir-50 px-4 py-3.5 ring-1 ring-ashir-100 ring-inset">
+                    <p className="text-[11px] font-semibold tracking-wider text-ashir-700 uppercase">Tu precio</p>
+                    <p className="mt-0.5 text-3xl font-bold tracking-tight tabular-nums text-ink-900">
+                      {fmtMoney(evaluation.data.finalUnitPrice)}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-ink-500">
+                      por unidad, sin IVA
+                      {Number.parseFloat(evaluation.data.totalDiscountPct) < -0.01 && (
+                        <span className="ml-1.5 font-semibold text-ok-700">
+                          ahorrás {Number.parseFloat(evaluation.data.totalDiscountPct).toFixed(1).replace('.', ',')}%
+                        </span>
+                      )}
+                    </p>
                   </div>
 
                   <p className="mt-2 text-[11px] leading-relaxed text-ink-400">

@@ -168,25 +168,33 @@ export function ProductTile({
     );
   }
 
-  const initials = product.brand.slice(0, 2);
-  const text = { sm: 'text-sm', md: 'text-xl', lg: 'text-3xl' }[size];
+  const color = brandColor(product.brand);
+  const text = { sm: 'text-[11px]', md: 'text-2xl', lg: 'text-4xl' }[size];
 
   return (
     <div
       className={cn(
-        'relative flex aspect-square w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border border-ink-100 bg-ink-50',
+        'relative flex aspect-square w-full flex-col items-center justify-center gap-1.5 overflow-hidden rounded-lg border border-ink-100 bg-white',
         className,
       )}
       role="img"
       aria-label={`${product.brand} · ${product.category}`}
     >
-      <span className={cn('font-bold tracking-tight text-ink-300', text)}>{initials}</span>
+      {/* Halo suave con el color de la marca: da presencia visual sin inventar
+          una foto de producto que el archivo de distribuidor no incluye. */}
+      <span
+        className="absolute inset-0 opacity-[0.07]"
+        style={{ background: `radial-gradient(circle at 50% 42%, ${color} 0%, transparent 62%)` }}
+        aria-hidden
+      />
+      <span className={cn('relative font-extrabold tracking-tighter', text)} style={{ color }}>
+        {product.brand.slice(0, size === 'sm' ? 2 : 4)}
+      </span>
       {size !== 'sm' && (
-        <span className="px-2 text-center text-[10px] leading-tight font-medium tracking-wide text-ink-400 uppercase">
+        <span className="relative px-3 text-center text-[10px] leading-tight font-semibold tracking-widest text-ink-400 uppercase">
           {product.category}
         </span>
       )}
-      <span className="absolute inset-x-0 bottom-0 h-0.5" style={{ background: brandColor(product.brand) }} aria-hidden />
     </div>
   );
 }
@@ -239,20 +247,18 @@ export function PriceDisplay({
 
   const discount = discountPct ? Number.parseFloat(discountPct) : 0;
   const hasDiscount = discount < -0.01;
-  const valueSize = { sm: 'text-[15px]', md: 'text-lg', lg: 'text-2xl' }[size];
+  const valueSize = { sm: 'text-[15px]', md: 'text-xl', lg: 'text-3xl' }[size];
 
   return (
     <div className={cn('flex flex-wrap items-baseline gap-x-2 gap-y-0.5', className)}>
-      <span className={cn('font-semibold tracking-tight tabular-nums text-ink-900', valueSize)}>
-        {fmtMoney(finalPrice)}
-      </span>
       {hasDiscount && showList && (
-        <>
-          <span className="text-[13px] tabular-nums text-ink-400 line-through">{fmtMoney(listPrice)}</span>
-          <Badge tone="ok" size="sm">
-            {discount.toFixed(1).replace('.', ',')}%
-          </Badge>
-        </>
+        <span className="w-full text-[12px] tabular-nums text-ink-400 line-through">{fmtMoney(listPrice)}</span>
+      )}
+      <span className={cn('font-bold tracking-tight tabular-nums text-ink-900', valueSize)}>{fmtMoney(finalPrice)}</span>
+      {hasDiscount && !showList && (
+        <Badge tone="ok" size="sm">
+          {discount.toFixed(1).replace('.', ',')}%
+        </Badge>
       )}
     </div>
   );

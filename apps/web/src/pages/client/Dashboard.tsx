@@ -72,13 +72,63 @@ export function ClientDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* ---------- encabezado ---------- */}
+      {/* ---------- hero ---------- */}
+      <section className="overflow-hidden rounded-2xl bg-linear-to-br from-ashir-600 via-ashir-600 to-ashir-800 text-white">
+        <div className="relative flex flex-wrap items-center justify-between gap-8 px-6 py-8 sm:px-10 sm:py-10">
+          {/* textura discreta para que el bloque no se vea plano */}
+          <span
+            className="pointer-events-none absolute -top-20 -right-16 size-72 rounded-full bg-white/10 blur-2xl"
+            aria-hidden
+          />
+          <span
+            className="pointer-events-none absolute -bottom-24 left-1/3 size-64 rounded-full bg-white/5 blur-2xl"
+            aria-hidden
+          />
+
+          <div className="relative min-w-0">
+            <p className="text-xs font-semibold tracking-widest text-ashir-100 uppercase">Portal mayorista</p>
+            <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
+              {greeting()}, {customer.tradeName}
+            </h1>
+            <p className="mt-2 max-w-lg text-[13px] leading-relaxed text-ashir-50/90">
+              Tu lista {customer.priceListId.replace('pl_', 'LP-').toUpperCase()} ya está aplicada en todo el catálogo.
+              Los precios que ves son los tuyos, con tus descuentos y promociones vigentes.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Link to="/catalogo">
+                <Button className="bg-white text-ashir-700 shadow-sm hover:bg-ashir-50">Ver catálogo</Button>
+              </Link>
+              <Link to="/quick-order">
+                <Button
+                  variant="outline"
+                  className="border-white/40 bg-transparent text-white ring-0 hover:bg-white/10"
+                  icon={<Sparkles className="size-4" />}
+                >
+                  Compra rápida
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          <div className="relative grid shrink-0 grid-cols-3 gap-6 text-center">
+            {[
+              { label: 'Crédito disponible', value: fmtMoney(account.creditAvailable, { compact: true }) },
+              { label: 'Puntos Ashir', value: partner.data ? `${fmtNumber(partner.data.points)}` : '—' },
+              { label: 'Pedidos en curso', value: String(inProgress.length) },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <p className="text-xl font-bold tabular-nums sm:text-2xl">{stat.value}</p>
+                <p className="mt-0.5 text-[11px] text-ashir-100">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- contexto de la cuenta ---------- */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">
-            {greeting()}, {customer.tradeName}
-          </h1>
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-ink-500">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-ink-500">
             <span className="flex items-center gap-1.5">
               Ejecutivo asignado:
               <span className="font-medium text-ink-800">{personName(customer.salesRepId)}</span>
