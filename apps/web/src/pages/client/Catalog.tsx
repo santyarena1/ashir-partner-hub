@@ -118,7 +118,7 @@ export function Catalog() {
       <div className="flex gap-6">
         {/* --- filtros desktop --- */}
         <aside className="hidden w-60 shrink-0 lg:block">
-          <div className="sticky top-32">{filtersPanel}</div>
+          <div className="sticky top-36 rounded-xl border border-ink-200 bg-white p-4">{filtersPanel}</div>
         </aside>
 
         <div className="min-w-0 flex-1">
@@ -206,7 +206,7 @@ export function Catalog() {
             </Card>
           ) : initialLoading ? (
             view === 'grid' ? (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <ProductCardSkeleton key={i} />
                 ))}
@@ -228,7 +228,7 @@ export function Catalog() {
               />
             </Card>
           ) : view === 'grid' ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
               {data!.data.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

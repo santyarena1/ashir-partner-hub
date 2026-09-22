@@ -5,6 +5,7 @@
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
+  Boxes,
   CalendarClock,
   CreditCard,
   FileText,
@@ -20,7 +21,7 @@ import { api } from '@/services';
 import { useSession } from '@/app/session';
 import { useAsync } from '@/app/hooks';
 import { customerById } from '@/mocks/fixtures/customers';
-import { featuredByCategory, newArrivals, topSellers, SELLABLE_PRODUCTS } from '@/mocks/fixtures/catalog';
+import { CATEGORIES, featuredByCategory, newArrivals, topSellers, SELLABLE_PRODUCTS } from '@/mocks/fixtures/catalog';
 import { ACTIVE_PROMOTIONS } from '@/mocks/fixtures/pricing';
 import { personName } from '@/mocks/fixtures/people';
 import { ORDER_STATUS, PAYMENT_TERM } from '@/lib/labels';
@@ -124,6 +125,27 @@ export function ClientDashboard() {
           </div>
         </div>
       </section>
+
+      {/* ---------- acceso rápido por categoría ---------- */}
+      <nav aria-label="Categorías del catálogo">
+        <div className="no-scrollbar -mx-1 flex gap-3 overflow-x-auto px-1 pb-1">
+          {CATEGORIES.slice(0, 8).map((category) => (
+            <Link
+              key={category.id}
+              to={`/catalogo?categoryId=${category.id}`}
+              className="group flex min-w-[132px] flex-1 shrink-0 flex-col items-center gap-2 rounded-xl border border-ink-200 bg-white px-4 py-4 transition-colors hover:border-ashir-300 hover:bg-ashir-50/40"
+            >
+              <span className="flex size-10 items-center justify-center rounded-full bg-ink-50 text-ink-400 transition-colors group-hover:bg-white group-hover:text-ashir-600">
+                <Boxes className="size-5" aria-hidden />
+              </span>
+              <span className="text-center text-[13px] leading-tight font-semibold text-ink-800 group-hover:text-ashir-700">
+                {category.name}
+              </span>
+              <span className="text-[11px] text-ink-400">{category.skuCount} SKUs</span>
+            </Link>
+          ))}
+        </div>
+      </nav>
 
       {/* ---------- contexto de la cuenta ---------- */}
       <div className="flex flex-wrap items-start justify-between gap-4">
