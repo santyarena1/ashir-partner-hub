@@ -1,0 +1,31 @@
+{
+  "source": "ashir-productos.xlsx",
+  "sheet": "Lista Ashir",
+  "importedAt": "2026-09-22T15:58:38.546Z",
+  "productCount": 245,
+  "brandCount": 10,
+  "categoryCount": 11,
+  "skippedRows": 13,
+  "problemCount": 38,
+  "simulatedFields": [
+    "cost",
+    "marginPct",
+    "stock",
+    "incoming",
+    "unitsSold12m",
+    "createdAt",
+    "image"
+  ],
+  "realFields": [
+    "sku",
+    "partNumber",
+    "name",
+    "brand",
+    "category",
+    "listPrice",
+    "suggestedRetail",
+    "vatRate",
+    "availability",
+    "specs"
+  ]
+}

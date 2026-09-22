@@ -1,0 +1,45 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/integrations/int_erp/sync",
+    "headers": {
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "entities": [
+        "products",
+        "stock",
+        "costs"
+      ]
+    }
+  },
+  "response": {
+    "status": 503,
+    "body": {
+      "error": {
+        "code": "UPSTREAM_UNAVAILABLE",
+        "message": "No se pudo establecer conexión con el servicio remoto (timeout tras 3 reintentos)."
+      },
+      "requestId": "req_demo_f1a20c93"
+    }
+  },
+  "sideEffect": {
+    "runRecorded": {
+      "id": "run_1758561234",
+      "integrationId": "int_erp",
+      "process": "Sincronización manual",
+      "direction": "BIDIRECTIONAL",
+      "records": 0,
+      "durationMs": 12400,
+      "result": "FAILED",
+      "errors": [
+        "No se pudo establecer conexión con el servicio remoto (timeout tras 3 reintentos)."
+      ],
+      "requestId": "req_demo_f1a20c93",
+      "summary": "La ejecución falló. El conector reintentará según su política."
+    },
+    "webhookEmitted": "integration.sync_failed"
+  },
+  "notes": "La ejecución fallida queda registrada igual: es lo que permite diagnosticar sin adivinar."
+}

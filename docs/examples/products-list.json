@@ -1,0 +1,87 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/v1/products?brandId=brand_msi&inStock=true&pageSize=2",
+    "headers": {
+      "Authorization": "Bearer <token>",
+      "X-Request-Id": "req_web_8f2a91bc"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "id": "prod_msvg5070tv3o",
+          "sku": "MSVG5070TV3O",
+          "partNumber": "V513-644R",
+          "name": "MSI GEFORCE RTX 5070 Ti VENTUS 3X 16G OC",
+          "brand": "MSI",
+          "brandId": "brand_msi",
+          "category": "GPUs",
+          "categoryId": "cat_gpus",
+          "listPrice": {
+            "amount": "1195.48",
+            "currency": "USD"
+          },
+          "suggestedRetail": {
+            "amount": "1446.53",
+            "currency": "USD"
+          },
+          "vatRate": 0.21,
+          "cost": null,
+          "marginPct": null,
+          "stock": 12,
+          "incoming": null,
+          "availability": "IN_STOCK",
+          "warrantyMonths": 36,
+          "specs": [
+            "16GB GDDR7",
+            "PCIe 5.0",
+            "TRIPLE FAN"
+          ],
+          "image": null
+        },
+        {
+          "id": "prod_msmoprb650mb",
+          "sku": "MSMOPRB650MB",
+          "partNumber": "7E26-001R",
+          "name": "MSI (SOCKET AM5) PRO B650M-B",
+          "brand": "MSI",
+          "brandId": "brand_msi",
+          "category": "Motherboards",
+          "categoryId": "cat_motherboards",
+          "listPrice": {
+            "amount": "76.83",
+            "currency": "USD"
+          },
+          "suggestedRetail": {
+            "amount": "92.96",
+            "currency": "USD"
+          },
+          "vatRate": 0.21,
+          "cost": null,
+          "marginPct": null,
+          "stock": 64,
+          "incoming": null,
+          "availability": "NEW_ARRIVAL",
+          "warrantyMonths": 36,
+          "specs": [
+            "AM5",
+            "DDR5",
+            "MICRO-ATX"
+          ],
+          "image": null
+        }
+      ],
+      "meta": {
+        "page": 1,
+        "pageSize": 2,
+        "total": 38,
+        "totalPages": 19
+      },
+      "requestId": "req_demo_8f2a91bc"
+    }
+  },
+  "notes": "cost y marginPct llegan en null porque el token no tiene scope cost:read."
+}

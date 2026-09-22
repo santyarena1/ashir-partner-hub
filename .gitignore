@@ -1,0 +1,43 @@
+# dependencias
+node_modules/
+.pnp
+.pnp.js
+
+# builds
+dist/
+dist-ssr/
+build/
+*.tsbuildinfo
+.vite/
+
+# entorno (nunca commitear credenciales)
+.env
+.env.local
+.env.*.local
+
+# plataforma
+.vercel/
+.turbo/
+
+# editores / sistema
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# logs
+*.log
+npm-debug.log*
+logs/
+
+# Excel temporal de Office
+~$*
+
+# El Excel de origen queda fuera del repo publico: la hoja "Cuentas Bancarias"
+# de la lista de distribuidor incluye CBU, alias y CUIT de Ashir.
+# El catalogo procesado vive en apps/web/src/mocks/generated/.
+data/import/*.xlsx
+data/import/*.xlsm
+data/import/*.xls
+data/import/*.csv

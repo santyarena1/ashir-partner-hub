@@ -1,0 +1,36 @@
+{
+  "request": {
+    "method": "PATCH",
+    "path": "/v1/orders/ord_ash_24853",
+    "headers": {
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "version": 7,
+      "items": [
+        {
+          "productId": "prod_msmoprb650mb",
+          "quantity": 8
+        }
+      ]
+    }
+  },
+  "response": {
+    "status": 409,
+    "body": {
+      "error": {
+        "code": "ORDER_VERSION_CONFLICT",
+        "message": "El pedido fue modificado desde otra sesión. Volvé a cargarlo para ver los cambios antes de editar.",
+        "details": [
+          {
+            "field": "version",
+            "reason": "STALE_VERSION"
+          }
+        ]
+      },
+      "requestId": "req_demo_789"
+    }
+  },
+  "notes": "El cliente debe releer el pedido (que estará en version 8), mostrar qué cambió y dejar decidir al usuario. No reintentar en ciclo."
+}

@@ -1,0 +1,127 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/orders",
+    "headers": {
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json",
+      "Idempotency-Key": "9f1c2b04-5f3a-4a6f-9c1e-0b2d7e8a1234"
+    },
+    "body": {
+      "customerId": "cus_gaming_store",
+      "items": [
+        {
+          "productId": "prod_msmoprb650mb",
+          "quantity": 10
+        },
+        {
+          "productId": "prod_ttgace300tgb",
+          "quantity": 12
+        }
+      ],
+      "customerPO": "OC-2291",
+      "notes": "Entregar por la mañana, el depósito cierra a las 13 h.",
+      "deliveryMethod": "DELIVERY"
+    }
+  },
+  "response": {
+    "status": 201,
+    "body": {
+      "data": {
+        "id": "ord_ash_24890",
+        "number": "ASH-24890",
+        "customerId": "cus_gaming_store",
+        "customerName": "Gaming Store",
+        "status": "DRAFT",
+        "version": 1,
+        "items": [
+          {
+            "id": "oi_new_0",
+            "productId": "prod_msmoprb650mb",
+            "sku": "MSMOPRB650MB",
+            "name": "MSI (SOCKET AM5) PRO B650M-B",
+            "quantity": 10,
+            "unitPrice": {
+              "amount": "67.97",
+              "currency": "USD"
+            },
+            "listPrice": {
+              "amount": "76.83",
+              "currency": "USD"
+            },
+            "discountPct": "-11.53",
+            "lineTotal": {
+              "amount": "679.70",
+              "currency": "USD"
+            },
+            "appliedConditions": [
+              "MSI-SEP-26",
+              "VOL-GEN-26"
+            ],
+            "shippedQty": 0
+          },
+          {
+            "id": "oi_new_1",
+            "productId": "prod_ttgace300tgb",
+            "sku": "TTGACE300TGB",
+            "name": "THERMALTAKE CERES 300 TG ARGB",
+            "quantity": 12,
+            "unitPrice": {
+              "amount": "82.78",
+              "currency": "USD"
+            },
+            "listPrice": {
+              "amount": "89.98",
+              "currency": "USD"
+            },
+            "discountPct": "-8.00",
+            "lineTotal": {
+              "amount": "993.36",
+              "currency": "USD"
+            },
+            "appliedConditions": [
+              "VOL-GEN-26"
+            ],
+            "shippedQty": 0
+          }
+        ],
+        "subtotal": {
+          "amount": "1673.06",
+          "currency": "USD"
+        },
+        "discountTotal": {
+          "amount": "162.70",
+          "currency": "USD"
+        },
+        "taxTotal": {
+          "amount": "351.34",
+          "currency": "USD"
+        },
+        "freight": {
+          "amount": "0.00",
+          "currency": "USD"
+        },
+        "total": {
+          "amount": "2024.40",
+          "currency": "USD"
+        },
+        "paymentTerm": "TRANSFER_7",
+        "deliveryMethod": "DELIVERY",
+        "customerPO": "OC-2291",
+        "allowedModifications": [
+          "ADD_ITEM",
+          "REMOVE_ITEM",
+          "CHANGE_QTY",
+          "CHANGE_NOTES",
+          "CHANGE_DELIVERY",
+          "CANCEL"
+        ],
+        "requiredApprovals": [],
+        "createdAt": "2026-09-22T11:12:44-03:00",
+        "updatedAt": "2026-09-22T11:12:44-03:00"
+      },
+      "requestId": "req_demo_0a7bd913"
+    }
+  },
+  "notes": "El flete es 0 porque el pedido supera el mínimo de envío bonificado de la zona AMBA."
+}

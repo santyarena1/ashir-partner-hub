@@ -1,0 +1,53 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/rma/serials/lookup",
+    "headers": {
+      "Authorization": "Bearer <token de Gaming Store>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "serial": "9MSI5070X93821"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": {
+        "status": "IN_WARRANTY",
+        "serial": "9MSI5070X93821",
+        "warrantyDaysRemaining": 906,
+        "message": "Producto en garantía hasta el 17/03/2029.",
+        "record": {
+          "serial": "9MSI5070X93821",
+          "sku": "MSVG5070TV3O",
+          "productName": "MSI GEFORCE RTX 5070 Ti VENTUS 3X 16G OC",
+          "brand": "MSI",
+          "category": "GPUs",
+          "orderNumber": "ASH-24853",
+          "invoiceNumber": "FA-0004-00012831",
+          "purchasedAt": "2026-03-17T11:40:00-03:00",
+          "warrantyMonths": 36,
+          "warrantyExpiresAt": "2029-03-17T11:40:00-03:00",
+          "lotId": "LOTE-MSI-260326-A",
+          "openRmaId": null,
+          "replacedBySerial": null
+        },
+        "eligibility": {
+          "eligible": true,
+          "requiresManualReview": false,
+          "policyId": "wp_msi_gpu",
+          "policyName": "MSI · Placas de video",
+          "warrantyMonths": 36,
+          "expiresAt": "2029-03-17T11:40:00-03:00",
+          "reasons": [
+            "Cubierto por la política MSI · Placas de video (36 meses desde la compra)."
+          ],
+          "flags": []
+        }
+      },
+      "requestId": "req_demo_b4710d28"
+    }
+  },
+  "notes": "La cuenta se resuelve desde el token. El cuerpo sólo lleva el serial."
+}

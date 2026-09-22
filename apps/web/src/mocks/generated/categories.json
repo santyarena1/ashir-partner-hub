@@ -1,0 +1,82 @@
+[
+  {
+    "id": "cat_refrigeracion",
+    "name": "Refrigeración",
+    "group": "Componentes",
+    "subcategories": [],
+    "skuCount": 40
+  },
+  {
+    "id": "cat_gabinetes",
+    "name": "Gabinetes",
+    "group": "Componentes",
+    "subcategories": [],
+    "skuCount": 38
+  },
+  {
+    "id": "cat_motherboards",
+    "name": "Motherboards",
+    "group": "Componentes",
+    "subcategories": [],
+    "skuCount": 34
+  },
+  {
+    "id": "cat_fuentes",
+    "name": "Fuentes",
+    "group": "Componentes",
+    "subcategories": [],
+    "skuCount": 28
+  },
+  {
+    "id": "cat_memorias",
+    "name": "Memorias",
+    "group": "Componentes",
+    "subcategories": [
+      "DDR4",
+      "DDR5"
+    ],
+    "skuCount": 25
+  },
+  {
+    "id": "cat_gpus",
+    "name": "GPUs",
+    "group": "Componentes",
+    "subcategories": [],
+    "skuCount": 22
+  },
+  {
+    "id": "cat_perifericos",
+    "name": "Periféricos",
+    "group": "Periféricos",
+    "subcategories": [],
+    "skuCount": 16
+  },
+  {
+    "id": "cat_monitores",
+    "name": "Monitores",
+    "group": "Visualización",
+    "subcategories": [],
+    "skuCount": 15
+  },
+  {
+    "id": "cat_procesadores",
+    "name": "Procesadores",
+    "group": "Componentes",
+    "subcategories": [],
+    "skuCount": 12
+  },
+  {
+    "id": "cat_ssd",
+    "name": "SSD",
+    "group": "Almacenamiento",
+    "subcategories": [],
+    "skuCount": 8
+  },
+  {
+    "id": "cat_sillas-gamer",
+    "name": "Sillas gamer",
+    "group": "Mobiliario",
+    "subcategories": [],
+    "skuCount": 7
+  }
+]

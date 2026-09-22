@@ -1,0 +1,36 @@
+{
+  "delivery": {
+    "method": "POST",
+    "url": "https://hooks.partner.example/ashir",
+    "headers": {
+      "Content-Type": "application/json",
+      "User-Agent": "Ashir-Webhooks/1.0",
+      "X-Ashir-Event-Id": "evt_1087",
+      "X-Ashir-Event-Type": "rma.resolved",
+      "X-Ashir-Timestamp": "1758560652000",
+      "X-Ashir-Signature": "9f1c2b04a7e3..."
+    }
+  },
+  "body": {
+    "eventId": "evt_1087",
+    "type": "rma.resolved",
+    "occurredAt": "2026-09-22T11:31:07-03:00",
+    "apiVersion": "2026-09-01",
+    "data": {
+      "rmaId": "rma_rma_260155",
+      "code": "RMA-260155",
+      "customerId": "cus_gaming_store",
+      "serial": "9MSI4410233",
+      "resolution": "REPLACED_NEW",
+      "replacementSerial": "9MSI4410233-R",
+      "replacementSku": "MSVG5070TV3O",
+      "resultingWarrantyExpiresAt": "2029-03-17T11:40:00-03:00",
+      "approvedBy": "Javier Ocampo"
+    }
+  },
+  "expectedResponse": {
+    "status": 200,
+    "body": ""
+  },
+  "notes": "eventId es estable entre reintentos: el receptor lo usa para descartar duplicados. La firma se calcula sobre timestamp + punto + rawBody."
+}

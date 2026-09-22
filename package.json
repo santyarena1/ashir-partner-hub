@@ -1,0 +1,25 @@
+{
+  "name": "ashir-partner-hub",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ashir Partner Hub — prototipo comercial de alta fidelidad del portal B2B de Ashir Technology Corp",
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @ashir/web",
+    "build": "npm run build --workspace @ashir/web",
+    "preview": "npm run preview --workspace @ashir/web",
+    "lint": "npm run lint --workspace @ashir/web",
+    "typecheck": "npm run typecheck --workspace @ashir/web",
+    "import:products": "node scripts/import-products.mjs",
+    "test": "npm run test --workspace @ashir/web"
+  },
+  "devDependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

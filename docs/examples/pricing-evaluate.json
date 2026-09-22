@@ -1,0 +1,136 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/pricing/evaluate",
+    "headers": {
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "productId": "prod_msmoprb650mb",
+      "quantity": 10,
+      "paymentTerm": "TRANSFER_7"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": {
+        "productId": "prod_msmoprb650mb",
+        "sku": "MSMOPRB650MB",
+        "quantity": 10,
+        "basePrice": {
+          "amount": "76.83",
+          "currency": "USD"
+        },
+        "adjustments": [
+          {
+            "type": "PRICE_LIST",
+            "label": "LP-PLATINUM-02 · MSI",
+            "percentage": "-5.00",
+            "amount": "-3.84",
+            "note": "Regla por marca"
+          },
+          {
+            "type": "PROMOTION",
+            "conditionId": "cond_msi_sept",
+            "label": "MSI Septiembre",
+            "percentage": "-3.00",
+            "amount": "-2.19",
+            "note": "No acumulable con otras promociones"
+          },
+          {
+            "type": "VOLUME_TIER",
+            "conditionId": "cond_volumen_general",
+            "label": "Volumen general por unidad · 10+ unidades",
+            "percentage": "-4.00",
+            "amount": "-2.83"
+          }
+        ],
+        "finalUnitPrice": {
+          "amount": "67.97",
+          "currency": "USD"
+        },
+        "lineTotal": {
+          "amount": "679.70",
+          "currency": "USD"
+        },
+        "totalDiscountPct": "-11.53",
+        "validUntil": "2026-09-30T23:59:59-03:00",
+        "explanation": "Partiendo de USD 76.83 se aplican LP-PLATINUM-02 · MSI (-5.00%), MSI Septiembre (-3.00%), Volumen general por unidad · 10+ unidades (-4.00%), resultando en USD 67.97 por unidad.",
+        "appliedConditions": [
+          {
+            "conditionId": "cond_msi_sept",
+            "code": "MSI-SEP-26",
+            "name": "MSI Septiembre",
+            "effect": "-3%"
+          },
+          {
+            "conditionId": "cond_volumen_general",
+            "code": "VOL-GEN-26",
+            "name": "Volumen general por unidad",
+            "effect": "-4% por 10+ u."
+          }
+        ],
+        "skippedConditions": [
+          {
+            "conditionId": "cond_volumen_gpu",
+            "code": "VOL-GPU-26",
+            "name": "Volumen GPUs",
+            "reason": "La categoría del producto es Motherboards"
+          },
+          {
+            "conditionId": "cond_pronto_pago",
+            "code": "PRONTO-PAGO",
+            "name": "Pronto pago",
+            "reason": "Ya se aplicó una condición no acumulable de mayor prioridad"
+          }
+        ],
+        "missedOpportunities": [
+          {
+            "conditionId": "cond_volumen_general",
+            "label": "Volumen general por unidad · escalón 25+",
+            "message": "Agregando 15 unidades más pasás al escalón de 5.50%.",
+            "potentialPct": "5.50",
+            "missingUnits": 15
+          }
+        ],
+        "tiers": [
+          {
+            "minQty": 1,
+            "maxQty": 4,
+            "discountPct": "-7.53",
+            "unitPrice": {
+              "amount": "71.04",
+              "currency": "USD"
+            }
+          },
+          {
+            "minQty": 10,
+            "maxQty": 24,
+            "discountPct": "-11.53",
+            "unitPrice": {
+              "amount": "67.97",
+              "currency": "USD"
+            }
+          },
+          {
+            "minQty": 25,
+            "maxQty": 49,
+            "discountPct": "-12.95",
+            "unitPrice": {
+              "amount": "66.88",
+              "currency": "USD"
+            }
+          }
+        ],
+        "bonusUnits": 0,
+        "freeFreight": false,
+        "pointsMultiplier": 1,
+        "requiresApproval": []
+      },
+      "requestId": "req_demo_7c19ba4f"
+    }
+  },
+  "notes": "skippedConditions es lo que hace el precio explicable: responde por qué NO se aplicó un descuento."
+}

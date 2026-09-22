@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/rma/serials/lookup",
+    "headers": {
+      "Authorization": "Bearer <token de Gaming Store>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "serial": "M4A7761200341"
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "data": {
+        "status": "NOT_YOUR_ACCOUNT",
+        "serial": "M4A7761200341",
+        "record": null,
+        "warrantyDaysRemaining": null,
+        "eligibility": null,
+        "message": "El producto fue distribuido por Ashir, pero no encontramos una compra asociada a tu cuenta. Contactá a tu ejecutivo para revisar el caso."
+      },
+      "requestId": "req_demo_c0ffee11"
+    }
+  },
+  "notes": "REGLA CRÍTICA: record llega en null. No se expone factura, fecha, precio ni razón social del tercero. El filtrado tiene que estar en el servidor, no en el frontend."
+}

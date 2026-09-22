@@ -1,0 +1,119 @@
+[
+  {
+    "id": "brand_thermaltake",
+    "name": "THERMALTAKE",
+    "pmId": "pm_lucia",
+    "color": "#d32027",
+    "skuCount": 61,
+    "categories": [
+      "Fuentes",
+      "Gabinetes",
+      "Refrigeración"
+    ]
+  },
+  {
+    "id": "brand_asus",
+    "name": "ASUS",
+    "pmId": "pm_martin",
+    "color": "#00539b",
+    "skuCount": 45,
+    "categories": [
+      "Fuentes",
+      "Refrigeración",
+      "Motherboards",
+      "GPUs",
+      "Monitores"
+    ]
+  },
+  {
+    "id": "brand_msi",
+    "name": "MSI",
+    "pmId": "pm_diego",
+    "color": "#c8102e",
+    "skuCount": 43,
+    "categories": [
+      "Fuentes",
+      "Gabinetes",
+      "Refrigeración",
+      "Motherboards",
+      "GPUs",
+      "Monitores",
+      "Periféricos"
+    ]
+  },
+  {
+    "id": "brand_evolabs",
+    "name": "EVOLABS",
+    "pmId": "pm_lucia",
+    "color": "#f97316",
+    "skuCount": 34,
+    "categories": [
+      "Fuentes",
+      "Gabinetes",
+      "Refrigeración",
+      "Sillas gamer"
+    ]
+  },
+  {
+    "id": "brand_adata",
+    "name": "ADATA",
+    "pmId": "pm_carla",
+    "color": "#e11d48",
+    "skuCount": 29,
+    "categories": [
+      "Memorias",
+      "SSD"
+    ]
+  },
+  {
+    "id": "brand_aureox",
+    "name": "AUREOX",
+    "pmId": "pm_carla",
+    "color": "#22c55e",
+    "skuCount": 15,
+    "categories": [
+      "Fuentes",
+      "Periféricos"
+    ]
+  },
+  {
+    "id": "brand_amd",
+    "name": "AMD",
+    "pmId": "pm_diego",
+    "color": "#ed1c24",
+    "skuCount": 12,
+    "categories": [
+      "Procesadores"
+    ]
+  },
+  {
+    "id": "brand_wicgtyp",
+    "name": "WICGTYP",
+    "pmId": "pm_martin",
+    "color": "#475569",
+    "skuCount": 2,
+    "categories": [
+      "Memorias"
+    ]
+  },
+  {
+    "id": "brand_acer",
+    "name": "ACER",
+    "pmId": "pm_martin",
+    "color": "#83b81a",
+    "skuCount": 2,
+    "categories": [
+      "Memorias"
+    ]
+  },
+  {
+    "id": "brand_ttesports",
+    "name": "TTESPORTS",
+    "pmId": "pm_lucia",
+    "color": "#d32027",
+    "skuCount": 2,
+    "categories": [
+      "Periféricos"
+    ]
+  }
+]

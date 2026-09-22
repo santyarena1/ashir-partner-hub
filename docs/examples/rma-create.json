@@ -1,0 +1,81 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/rma/cases",
+    "headers": {
+      "Authorization": "Bearer <token>",
+      "Content-Type": "application/json",
+      "Idempotency-Key": "c4d1f2a8-9b3e-4c7d-8e1f-2a3b4c5d6e7f"
+    },
+    "body": {
+      "serials": [
+        "9MSI5070X93821"
+      ],
+      "problemType": "NO_VIDEO",
+      "description": "El equipo enciende pero no da imagen. Se probaron dos monitores y tres cables diferentes.",
+      "answers": [
+        {
+          "question": "La placa da imagen?",
+          "answer": "No"
+        },
+        {
+          "question": "Fue probada en otro equipo?",
+          "answer": "Sí"
+        },
+        {
+          "question": "Se probaron otros cables de alimentación?",
+          "answer": "Sí"
+        }
+      ],
+      "troubleshootingOutcome": "ALREADY_TRIED",
+      "logisticsMode": "CARRIER"
+    }
+  },
+  "response": {
+    "status": 201,
+    "body": {
+      "data": {
+        "id": "rma_rma_260201",
+        "code": "RMA-260201",
+        "customerId": "cus_gaming_store",
+        "customerName": "Gaming Store",
+        "status": "SUBMITTED",
+        "isBatch": false,
+        "units": [
+          {
+            "id": "unit_RMA-260201_0",
+            "serial": "9MSI5070X93821",
+            "sku": "MSVG5070TV3O",
+            "productName": "MSI GEFORCE RTX 5070 Ti VENTUS 3X 16G OC",
+            "brand": "MSI",
+            "lotId": "LOTE-MSI-260326-A",
+            "problemType": "NO_VIDEO",
+            "problemLabel": "Sin imagen",
+            "status": "SUBMITTED"
+          }
+        ],
+        "logistics": {
+          "mode": "CARRIER",
+          "remitNumber": null,
+          "labelCode": "ETQ-RMA-260201",
+          "carrier": "Andreani",
+          "expectedUnits": 1,
+          "receivedUnits": 0
+        },
+        "sla": {
+          "stage": "VALIDATION",
+          "targetHours": 24,
+          "elapsedHours": 0,
+          "remainingHours": 24,
+          "breached": false,
+          "pausedReason": null,
+          "dueAt": "2026-09-23T11:20:00-03:00"
+        },
+        "createdAt": "2026-09-22T11:20:00-03:00",
+        "closedAt": null
+      },
+      "requestId": "req_demo_77ad2e51"
+    }
+  },
+  "notes": "El remito se emite cuando Ashir aprueba la recepción, no al crear el caso."
+}
