@@ -46,15 +46,18 @@ export function brandDashboard(brandId: string): PmBrandDashboard {
 
   /* --- ventas: escaladas por el peso real de la marca dentro del catalogo --- */
   const months = lastTwelveMonths();
-  // Base mensual estable + estacionalidad suave, escalada por el tamaño real de la marca.
-  const brandWeight = priced.reduce((acc, p) => acc + num(p.listPrice) * p.unitsSold12m, 0) / 12;
+
+  // Facturación mensual promedio de la marca, en USD: precio de lista real por
+  // unidades vendidas del período, repartido en los 12 meses.
+  const monthlyRevenue = priced.reduce((acc, p) => acc + num(p.listPrice) * p.unitsSold12m, 0) / 12;
+  const monthlyUnitsSold = Math.max(1, Math.round(priced.reduce((a, p) => a + p.unitsSold12m, 0) / 12));
+  const avgUnitPrice = monthlyRevenue / monthlyUnitsSold;
 
   const series = months.map((m, i) => {
     const seasonal = 0.82 + 0.36 * Math.sin((i / 11) * Math.PI * 1.2);
     const noise = 0.9 + seeded(brand.id + i)() * 0.22;
-    const sales = Math.round((brandWeight / 1_000) * seasonal * noise);
-    const avgPrice = priced.length ? brandWeight / Math.max(1, priced.reduce((a, p) => a + p.unitsSold12m, 0) / 12) : 1;
-    const units = Math.max(1, Math.round(sales / Math.max(1, avgPrice / 40)));
+    const sales = Math.round(monthlyRevenue * seasonal * noise);
+    const units = Math.max(1, Math.round(sales / Math.max(1, avgUnitPrice)));
     const marginPct = Number((17 + seeded(brand.id + 'm' + i)() * 9).toFixed(1));
     const stockValue = Math.round(sales * (1.6 + seeded(brand.id + 's' + i)() * 0.9));
     const coverageDays = Math.round(28 + seeded(brand.id + 'c' + i)() * 42);
@@ -166,7 +169,11 @@ export function brandDashboard(brandId: string): PmBrandDashboard {
   const rmaRate = brandUnitsSold > 0 ? (brandRmas.length / brandUnitsSold) * 100 : 0;
 
   const criticalSkus = priced.filter((p) => p.stock > 0 && p.stock <= 5).length;
-  const monthlyTarget = num(pm.monthlyTarget) / Math.max(1, pm.brandIds.length);
+  // El objetivo se fija algo por encima del run-rate de la marca, con una
+  // variación por marca: así el cumplimiento es una cifra con sentido y no
+  // todas las marcas quedan clavadas en el mismo porcentaje.
+  const targetStretch = 1.05 + seeded(brand.id + 'target')() * 0.22;
+  const monthlyTarget = Math.round(monthlyRevenue * targetStretch);
 
   return {
     brandId: brand.id,

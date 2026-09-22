@@ -41,3 +41,5 @@ data/import/*.xlsx
 data/import/*.xlsm
 data/import/*.xls
 data/import/*.csv
+
+.vercel
