@@ -71,7 +71,13 @@ export function ClientLayout() {
       </div>
 
       {/* ---------------- header principal ---------------- */}
-      <header className="sticky top-0 z-50 border-b border-ink-100 bg-white/95 backdrop-blur">
+      {/*
+        Fondo solido, sin backdrop-blur: el blur crea un «backdrop root» y
+        los desplegables que caen fuera de la caja del header (menu de
+        cuenta, selector de rol, notificaciones) se compositan translucidos.
+        Sobre fondo blanco el blur no aportaba nada.
+      */}
+      <header className="sticky top-0 z-50 border-b border-ink-100 bg-white">
         <div className="mx-auto flex h-18 max-w-[1320px] items-center gap-4 px-4 sm:px-6">
           <Link to="/" className="shrink-0" aria-label="Ashir Partner Hub · inicio">
             <AshirLogo className="h-10" tone="dark" />
