@@ -94,6 +94,37 @@ export function SectionTitle({
   );
 }
 
+/**
+ * Encabezado de zona: separa bloques que responden preguntas distintas.
+ *
+ * `SectionTitle` agrupa contenido afín dentro de una misma idea; esto marca
+ * el corte entre ideas — «lo que requiere acción» y «cómo viene el mes» no
+ * son dos secciones más de la misma lista, son dos cosas distintas.
+ */
+export function ZoneHeader({
+  title,
+  subtitle,
+  action,
+  className,
+}: {
+  title: ReactNode;
+  subtitle?: ReactNode;
+  action?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn('mb-4 border-t border-ink-200 pt-5 first:mt-0 first:border-t-0 first:pt-0', className)}>
+      <div className="flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          <h2 className="text-[11px] font-bold tracking-[0.12em] text-ink-400 uppercase">{title}</h2>
+          {subtitle && <p className="mt-1 text-[13px] text-ink-500">{subtitle}</p>}
+        </div>
+        {action}
+      </div>
+    </div>
+  );
+}
+
 /* ================================================================== */
 /* KPIs                                                                */
 /* ================================================================== */

@@ -20,16 +20,20 @@ import { CUSTOMERS } from '@/mocks/fixtures/customers';
 import { personName } from '@/mocks/fixtures/people';
 import { AshirLogo } from '@/components/domain/logo';
 import { AssistBar } from '@/components/domain/assist-bar';
+import { ACCOUNT_LINKS_FLAT, AccountMenu } from '@/components/domain/account-menu';
 
+/**
+ * Barra principal: solo la tienda.
+ *
+ * Todo lo que es gestion de la cuenta (pedidos, cuenta corriente,
+ * comprobantes, PVP, beneficios y garantias) vive en el menu «Mi cuenta»,
+ * a la derecha. Antes convivian ocho items iguales y no se distinguia
+ * comprar de administrar.
+ */
 const NAV = [
   { to: '/catalogo', label: 'Productos' },
   { to: '/marcas', label: 'Marcas' },
   { to: '/promociones', label: 'Promociones' },
-  { to: '/pedidos', label: 'Mis pedidos' },
-  { to: '/beneficios', label: 'Beneficios' },
-  { to: '/cuenta', label: 'Mi cuenta' },
-  { to: '/pvp', label: 'Control de PVP' },
-  { to: '/rma', label: 'Garantías' },
 ];
 
 export function ClientLayout() {
@@ -164,21 +168,27 @@ export function ClientLayout() {
               );
             })}
 
-            {customer && (
-              <span className="ml-auto flex items-center gap-2 py-2 text-[11px] text-ink-400">
-                Comprando como
-                <span className="font-semibold text-ink-700">{customer.tradeName}</span>
-              </span>
-            )}
+            {/* la gestion de la cuenta no compite con la tienda: va aparte */}
+            <div className="ml-auto flex items-center gap-3">
+              {customer && (
+                <span className="hidden items-center gap-1.5 text-[11px] text-ink-400 xl:flex">
+                  Comprando como
+                  <span className="font-semibold text-ink-700">{customer.tradeName}</span>
+                </span>
+              )}
+              <span className="h-5 w-px bg-ink-200" aria-hidden />
+              <AccountMenu />
+            </div>
           </div>
         </nav>
 
-        {/* navegación mobile */}
+        {/* navegación mobile: misma división que en desktop */}
         {mobileOpen && (
           <nav className="animate-fade-in border-t border-ink-100 lg:hidden" aria-label="Navegación principal">
-            <ul className="px-2 py-2">
-              {[...NAV, { to: '/quick-order', label: 'Compra rápida' }, { to: '/docs', label: 'Documentación API' }].map(
-                (item) => (
+            <div className="px-2 py-2">
+              <p className="px-3 py-1.5 text-[10px] font-semibold tracking-wide text-ink-400 uppercase">Comprar</p>
+              <ul>
+                {[...NAV, { to: '/quick-order', label: 'Compra rápida' }].map((item) => (
                   <li key={item.to}>
                     <NavLink
                       to={item.to}
@@ -193,9 +203,40 @@ export function ClientLayout() {
                       {item.label}
                     </NavLink>
                   </li>
-                ),
-              )}
-            </ul>
+                ))}
+              </ul>
+
+              <p className="mt-2 border-t border-ink-100 px-3 pt-3 pb-1.5 text-[10px] font-semibold tracking-wide text-ink-400 uppercase">
+                Mi cuenta
+              </p>
+              <ul>
+                {ACCOUNT_LINKS_FLAT.map((item) => (
+                  <li key={item.to}>
+                    <NavLink
+                      to={item.to}
+                      onClick={() => setMobileOpen(false)}
+                      className={({ isActive }) =>
+                        cn(
+                          'block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                          isActive ? 'bg-ashir-50 text-ashir-700' : 'text-ink-700 hover:bg-ink-100',
+                        )
+                      }
+                    >
+                      {item.label}
+                    </NavLink>
+                  </li>
+                ))}
+                <li>
+                  <NavLink
+                    to="/docs"
+                    onClick={() => setMobileOpen(false)}
+                    className="block rounded-lg px-3 py-2.5 text-sm font-medium text-ink-500 transition-colors hover:bg-ink-100"
+                  >
+                    Documentación API
+                  </NavLink>
+                </li>
+              </ul>
+            </div>
           </nav>
         )}
       </header>

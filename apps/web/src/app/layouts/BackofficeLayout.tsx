@@ -162,14 +162,19 @@ const ADMIN_NAV: NavGroup[] = [
     ],
   },
   {
-    label: 'Plataforma',
+    label: 'Datos e integraciones',
     items: [
       { to: '/bo/importaciones', label: 'Importaciones', icon: Import },
       { to: '/bo/integraciones', label: 'Integraciones', icon: Plug },
       { to: '/bo/webhooks', label: 'Webhooks', icon: Webhook },
+      { to: '/docs', label: 'Documentación API', icon: FileCode2 },
+    ],
+  },
+  {
+    label: 'Sistema',
+    items: [
       { to: '/bo/reportes', label: 'Reportes', icon: FileText },
       { to: '/bo/auditoria', label: 'Auditoría', icon: ClipboardList },
-      { to: '/docs', label: 'Documentación API', icon: FileCode2 },
       { to: '/bo/configuracion', label: 'Configuración', icon: Settings },
     ],
   },
@@ -224,9 +229,9 @@ export function BackofficeLayout() {
 
         <nav className="min-h-0 flex-1 overflow-y-auto px-2 py-3" aria-label="Navegación del backoffice">
           {groups.map((group, gi) => (
-            <div key={group.label ?? `g${gi}`} className={cn(gi > 0 && 'mt-4')}>
+            <div key={group.label ?? `g${gi}`} className={cn(gi > 0 && 'mt-3 border-t border-ink-800 pt-3')}>
               {group.label && (
-                <p className="px-2.5 pb-1.5 text-[10px] font-semibold tracking-wider text-ink-500 uppercase">
+                <p className="px-2.5 pb-1.5 text-[10px] font-semibold tracking-wider text-ink-400 uppercase">
                   {group.label}
                 </p>
               )}

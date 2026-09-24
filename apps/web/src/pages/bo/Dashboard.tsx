@@ -31,6 +31,7 @@ import {
   EmptyState,
   PageHeader,
   SectionTitle,
+  ZoneHeader,
   StatGrid,
   StatTile,
   type Column,
@@ -136,7 +137,13 @@ export function BoDashboard() {
         badge={<Badge tone="neutral">{ROLE_LABEL[role]}</Badge>}
       />
 
-      {/* ---------- alertas accionables ---------- */}
+      {/* ================= zona 1 — requiere acción ================= */}
+      {(breachedRmas.length > 0 || overview.pendingApproval > 0 || pendingRequests.length > 0) && (
+        <ZoneHeader
+          title="Requiere una acción"
+          subtitle="Cosas frenadas esperando que alguien decida"
+        />
+      )}
       <div className="mb-6 space-y-2">
         {breachedRmas.length > 0 && (
           <Callout
@@ -192,7 +199,10 @@ export function BoDashboard() {
         )}
       </div>
 
-      {/* ---------- KPIs ---------- */}
+      {/* ================= zona 2 — cómo viene el mes ================= */}
+      <ZoneHeader title="Cómo viene el mes" subtitle="Volumen, mezcla de marcas y distribución de pedidos" />
+
+      {/* KPIs */}
       {isSales ? (
         <StatGrid cols={4} className="mb-6">
           <StatTile
@@ -312,7 +322,9 @@ export function BoDashboard() {
         </ChartFrame>
       </div>
 
-      {/* ---------- tablas y widgets ---------- */}
+      {/* ================= zona 3 — operación del día ================= */}
+      <ZoneHeader title="Operación del día" subtitle="Lo que hay sobre la mesa ahora mismo" />
+
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0 space-y-5">
           <section>
